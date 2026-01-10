@@ -3,61 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LC Spanish Master - Señor Martín</title>
+    <title>LC Oral Master - Señor Martín</title>
     <style>
         :root { --primary: #1a237e; --secondary: #c62828; }
         body { font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #e5ddd5; }
-        
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; flex-shrink: 0; }
-        
-        /* Botones de Role Play más grandes para iPad */
-        .selector { display: flex; overflow-x: auto; gap: 10px; padding: 10px; background: #fff; border-bottom: 2px solid #ccc; flex-shrink: 0; }
-        .rp-btn { min-width: 80px; padding: 12px; background: #f0f0f0; border: 1px solid #999; border-radius: 8px; font-weight: bold; font-size: 14px; text-align: center; cursor: pointer; }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; flex-shrink: 0; font-weight: bold; }
+        .selector { display: flex; overflow-x: auto; gap: 8px; padding: 10px; background: #fff; border-bottom: 2px solid #ccc; flex-shrink: 0; }
+        .rp-btn { min-width: 90px; padding: 10px; background: #f8f8f8; border: 1px solid #999; border-radius: 8px; font-size: 13px; text-align: center; cursor: pointer; }
         .active { background: var(--secondary) !important; color: white; }
-
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .bubble { max-width: 80%; padding: 12px; border-radius: 12px; font-size: 16px; line-height: 1.4; }
+        .bubble { max-width: 80%; padding: 12px; border-radius: 12px; font-size: 16px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .ex { align-self: flex-start; background: white; }
         .st { align-self: flex-end; background: #dcf8c6; }
-
-        /* Espacio de respuesta reforzado */
-        .input-area { background: white; padding: 20px; display: flex; gap: 10px; border-top: 2px solid var(--primary); padding-bottom: 50px; }
-        input { flex: 1; padding: 15px; border-radius: 10px; border: 1px solid #ccc; font-size: 18px; }
-        .action-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-size: 20px; font-weight: bold; }
+        .input-area { background: white; padding: 15px 15px 40px 15px; display: flex; gap: 10px; border-top: 2px solid var(--primary); }
+        input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 17px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 50%; font-size: 20px; }
     </style>
 </head>
 <body>
 
-<header>Señor Martín: LC Oral Prep</header>
+<header>Señor Martín: Simulador Oficial SEC</header>
 
 <div class="selector">
-    <div class="rp-btn" id="b1" onclick="start(1)">🏠 Cáceres</div>
-    <div class="rp-btn" id="b2" onclick="start(2)">💻 Ávila</div>
-    <div class="rp-btn" id="b3" onclick="start(3)">🚐 Caravana</div>
-    <div class="rp-btn" id="b4" onclick="start(4)">♻️ Ambiente</div>
-    <div class="rp-btn" id="b5" onclick="start(5)">🚗 Avería</div>
+    <div class="rp-btn" id="b1" onclick="start(1)">🏠 1. Cáceres</div>
+    <div class="rp-btn" id="b2" onclick="start(2)">💻 2. Ávila</div>
+    <div class="rp-btn" id="b3" onclick="start(3)">🚐 3. Caravana</div>
+    <div class="rp-btn" id="b4" onclick="start(4)">♻️ 4. Plásticos</div>
+    <div class="rp-btn" id="b5" onclick="start(5)">🚗 5. Avería</div>
 </div>
 
 <div id="chat">
-    <div class="bubble ex"><b>Sñr Martín:</b> Pulsa un tema arriba para empezar.</div>
+    <div class="bubble ex"><b>Sñr Martín:</b> Pulsa un Role Play para empezar el examen según la tarjeta oficial.</div>
 </div>
 
 <div class="input-area">
-    <button class="action-btn" id="mic" onclick="runMic()">🎙️</button>
-    <input type="text" id="box" placeholder="Escribe aquí...">
-    <button class="action-btn" onclick="send()">▶️</button>
+    <button class="btn" id="mic" onclick="runMic()">🎙️</button>
+    <input type="text" id="box" placeholder="Responde al examinador...">
+    <button class="btn" onclick="send()">▶️</button>
 </div>
 
 <script>
-    let current = null;
-    let step = 0;
+    let current = null; let step = 0;
 
     const data = {
-        1: ["¡Hola, dígame!", "¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Es una ciudad pequeña pero muy bonita. ¿Has estado alguna vez en Extremadura?", "¡Perfecto! Fin del examen."],
-        2: ["Buenos días. ¿Qué le pasa a tu portátil?", "¡Qué mala suerte! ¿Tienes copia de seguridad?", "Puedo ofrecértelo por 300 euros hoy mismo. ¿Te interesa?", "¿Lo necesitas para el colegio?", "Terminado."],
-        3: ["¡Hola! ¿Quieres alquilar una autocaravana?", "¿Quién va a conducir?", "¿Tu madre tiene experiencia?", "¿Qué ciudades de Castilla-La Mancha queréis visitar?", "Completado."],
-        4: ["¡Hola! Pareces muy contento. ¿Por qué?", "¿Es importante prohibir los plásticos?", "¿Qué materiales usarías tú?", "¿Reciclas en casa?", "Finalizado."],
-        5: ["¡Hola! Debes estar entre Medina del Campo y Tordesillas. ¿Ves señales?", "Dime cómo es tu coche.", "¿Llevas mucho tiempo esperando?", "¿Es la primera vez que te pasa?", "Suerte."]
+        1: ["¡Hola, dígame!", "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.", "¿Has estado alguna vez en Extremadura?", "¡Perfecto! Hemos terminado."],
+        2: ["Buenos días. ¿En qué puedo ayudarte?", "Veo que tienes un problema con el portátil. ¿Qué le ha pasado exactamente a la pantalla?", "¡Qué mala suerte! Y mañana es un día importante. ¿Tienes una copia de seguridad de tus archivos?", "Mira, tengo una oferta: te lo puedo arreglar hoy mismo por trescientos euros. ¿Qué te parece?", "¿Necesitas el portátil para el colegio o para la universidad?", "Examen finalizado. ¡Buen trabajo!"],
+        3: ["Hola, buenos días. ¿Quieres alquilar una autocaravana?", "¿Quién va a conducir la caravana?", "¿Tu madre ha tenido algún accidente últimamente?", "Castilla-La Mancha es una zona preciosa. ¿Qué ciudades queréis visitar?", "¿Cuántas personas vais a viajar en total?", "Role Play completado."],
+        4: ["¡Hola! Pareces muy contento/a. ¿Por qué?", "Es una noticia fantástica. ¿Sabes cuándo entrará en vigor la prohibición del Parlamento Europeo?", "Es verdad. ¿Qué materiales crees que se deberían usar ahora?", "En casa intentamos reciclar siempre. ¿Y tú?", "¿Crees que los jóvenes están más concienciados que los adultos?", "¡Muy bien! Hemos terminado."],
+        5: ["¡Hola, buenas tardes!", "Debes estar entre Medina del Campo y Tordesillas, cerca de la salida ciento cincuenta y seis. ¿Ves alguna señal de tráfico por ahí?", "Claro que sí. Voy a ayudarte inmediatamente. ¿Me puedes describir tu coche?", "¿Llevas mucho tiempo esperando?", "¿Es la primera vez que tienes un problema con este coche?", "El mecánico llegará pronto. ¡Suerte!"]
     };
 
     function speak(txt) {
@@ -91,14 +84,13 @@
         if (!i.value) return;
         document.getElementById('chat').innerHTML += `<div class="bubble st">${i.value}</div>`;
         i.value = "";
-        setTimeout(next, 1000);
+        setTimeout(next, 1200);
     }
 
     function runMic() {
         let Reco = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!Reco) return alert("Micro no soportado");
-        let r = new Reco();
-        r.lang = 'es-ES';
+        if (!Reco) return alert("Micro no disponible");
+        let r = new Reco(); r.lang = 'es-ES';
         r.onstart = () => document.getElementById('mic').style.background = 'red';
         r.onresult = (e) => {
             document.getElementById('box').value = e.results[0][0].transcript;
