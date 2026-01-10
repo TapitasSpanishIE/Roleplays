@@ -2,46 +2,53 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LC Spanish Master - Señor Martín</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LC Oral Master - Señor Martín</title>
     <style>
-        :root { --primary: #1a237e; --secondary: #c62828; --bg: #f5f5f5; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { background: var(--primary); color: white; padding: 10px; text-align: center; border-bottom: 4px solid var(--secondary); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 5px; padding: 10px; background: white; }
-        .card { background: #eee; border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; font-size: 0.75rem; border: 2px solid transparent; font-weight: bold; }
-        .card.active { border-color: var(--secondary); background: #fff5f5; color: var(--secondary); }
-        .chat-window { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #e5ddd5; }
-        .bubble { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 15px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .ex { align-self: flex-start; background: white; border-bottom-left-radius: 2px; }
-        .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; }
-        .input-box { padding: 10px; background: white; display: flex; gap: 8px; align-items: center; border-top: 1px solid #ccc; }
-        input { flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #ccc; outline: none; font-size: 16px; }
-        .btn-icon { background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; justify-content: center; align-items: center; }
+        :root { --primary: #1a237e; --secondary: #c62828; --bg: #e5ddd5; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Encabezado y Selector */
+        header { background: var(--primary); color: white; padding: 10px; text-align: center; flex-shrink: 0; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; background: #f0f0f0; border-bottom: 2px solid #ccc; flex-shrink: 0; }
+        .card { background: white; border-radius: 5px; padding: 8px 2px; text-align: center; cursor: pointer; font-size: 0.7rem; border: 1px solid #ccc; font-weight: bold; }
+        .card.active { background: var(--secondary); color: white; border-color: var(--secondary); }
+
+        /* Ventana de Chat */
+        #chat { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Fondo tipo WhatsApp opcional */ }
+        .bubble { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 16px; line-height: 1.4; position: relative; }
+        .ex { align-self: flex-start; background: white; border-bottom-left-radius: 2px; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
+        .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
+
+        /* ÁREA DEL CANDIDATO (FIJA ABAJO) */
+        .controls { background: white; padding: 15px; display: flex; gap: 10px; align-items: center; border-top: 1px solid #ccc; flex-shrink: 0; padding-bottom: 30px; /* Espacio extra para el iPad */ }
+        input { flex: 1; padding: 15px; border-radius: 25px; border: 1px solid #bbb; outline: none; font-size: 16px; -webkit-appearance: none; }
+        .btn-circle { background: var(--primary); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 22px; flex-shrink: 0; }
+        #mic-btn { background: #444; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1 style="margin:0; font-size: 1.1rem;">Señor Martín: LC Oral Prep 2026</h1>
+    <h1 style="margin:0; font-size: 1rem;">Señor Martín: Simulador Oral SEC</h1>
 </header>
 
 <div class="grid">
-    <div class="card" id="rp1" onclick="initRP(1)">🏠 Cáceres</div>
-    <div class="card" id="rp2" onclick="initRP(2)">💻 Ávila</div>
-    <div class="card" id="rp3" onclick="initRP(3)">🚐 Caravana</div>
-    <div class="card" id="rp4" onclick="initRP(4)">♻️ Ambiente</div>
-    <div class="card" id="rp5" onclick="initRP(5)">🚗 Avería</div>
+    <div class="card" id="rp1" onclick="initRP(1)">🏠 Aloj.</div>
+    <div class="card" id="rp2" onclick="initRP(2)">💻 Port.</div>
+    <div class="card" id="rp3" onclick="initRP(3)">🚐 Carav.</div>
+    <div class="card" id="rp4" onclick="initRP(4)">♻️ Amb.</div>
+    <div class="card" id="rp5" onclick="initRP(5)">🚗 Aver.</div>
 </div>
 
-<div class="chat-window" id="chat">
-    <div class="bubble ex"><b>Señor Martín:</b> ¡Hola! Elige una situación para empezar el Role Play oficial.</div>
+<div id="chat">
+    <div class="bubble ex"><b>Señor Martín:</b> Bienvenido. Selecciona un Role Play arriba para comenzar el examen.</div>
 </div>
 
-<div class="input-box">
-    <button class="btn-icon" id="mic-btn" onclick="activarMicro()">🎙️</button>
-    <input type="text" id="userInput" placeholder="Escribe o usa el micro...">
-    <button class="btn-icon" onclick="procesarRespuesta()">▶️</button>
+<div class="controls">
+    <button class="btn-circle" id="mic-btn" onclick="activarMicro()">🎙️</button>
+    <input type="text" id="userInput" placeholder="Escribe tu respuesta aquí...">
+    <button class="btn-circle" onclick="procesarRespuesta()">▶️</button>
 </div>
 
 <script>
@@ -69,7 +76,7 @@
         step = 0;
         document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
         document.getElementById('rp'+id).classList.add('active');
-        document.getElementById('chat').innerHTML = `<div class="bubble ex"><b>Sistema:</b> Iniciando situación ${id}...</div>`;
+        document.getElementById('chat').innerHTML = ""; // Limpiar chat al empezar
         avanzarExamen();
     }
 
@@ -77,32 +84,34 @@
         if (!currentRP || step >= scriptData[currentRP].length) return;
         const frase = scriptData[currentRP][step];
         const chat = document.getElementById('chat');
-        setTimeout(() => {
-            chat.innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${frase}</div>`;
-            hablar(frase);
-            chat.scrollTop = chat.scrollHeight;
-            step++;
-        }, 600);
+        chat.innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${frase}</div>`;
+        hablar(frase);
+        chat.scrollTop = chat.scrollHeight;
+        step++;
     }
 
     function procesarRespuesta() {
         const input = document.getElementById('userInput');
         if (!input.value) return;
-        document.getElementById('chat').innerHTML += `<div class="bubble st">${input.value}</div>`;
+        const chat = document.getElementById('chat');
+        chat.innerHTML += `<div class="bubble st">${input.value}</div>`;
+        const userText = input.value;
         input.value = "";
+        chat.scrollTop = chat.scrollHeight;
         setTimeout(avanzarExamen, 1500);
     }
 
     function activarMicro() {
-        const rec = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
-        rec.lang = 'es-ES';
-        rec.onstart = () => document.getElementById('mic-btn').style.background = 'red';
-        rec.onresult = (e) => {
+        const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
+        recognition.lang = 'es-ES';
+        recognition.onstart = () => { document.getElementById('mic-btn').style.background = 'red'; };
+        recognition.onresult = (e) => {
             document.getElementById('userInput').value = e.results[0][0].transcript;
-            document.getElementById('mic-btn').style.background = '#1a237e';
+            document.getElementById('mic-btn').style.background = '#444';
             setTimeout(procesarRespuesta, 500);
         };
-        rec.start();
+        recognition.onerror = () => { document.getElementById('mic-btn').style.background = '#444'; };
+        recognition.start();
     }
 </script>
 </body>
