@@ -5,33 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LC Oral Master - Señor Martín</title>
     <style>
-        :root { --primary: #1a237e; --secondary: #c62828; --bg: #e5ddd5; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        :root { --primary: #1a237e; --secondary: #c62828; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #fff; }
         
-        /* Encabezado y Selector */
         header { background: var(--primary); color: white; padding: 10px; text-align: center; flex-shrink: 0; }
-        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; background: #f0f0f0; border-bottom: 2px solid #ccc; flex-shrink: 0; }
-        .card { background: white; border-radius: 5px; padding: 8px 2px; text-align: center; cursor: pointer; font-size: 0.7rem; border: 1px solid #ccc; font-weight: bold; }
-        .card.active { background: var(--secondary); color: white; border-color: var(--secondary); }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 8px; background: #f0f0f0; flex-shrink: 0; }
+        .card { background: white; border-radius: 4px; padding: 10px 2px; text-align: center; cursor: pointer; font-size: 0.7rem; border: 1px solid #ccc; font-weight: bold; }
+        .card.active { background: var(--secondary); color: white; }
 
-        /* Ventana de Chat */
-        #chat { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Fondo tipo WhatsApp opcional */ }
-        .bubble { max-width: 85%; padding: 10px 14px; border-radius: 15px; font-size: 16px; line-height: 1.4; position: relative; }
-        .ex { align-self: flex-start; background: white; border-bottom-left-radius: 2px; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
-        .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; box-shadow: 0 1px 1px rgba(0,0,0,0.2); }
+        #chat { flex-grow: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background-color: #e5ddd5; }
+        .bubble { max-width: 85%; padding: 12px; border-radius: 15px; font-size: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .ex { align-self: flex-start; background: white; border-bottom-left-radius: 2px; }
+        .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; }
 
-        /* ÁREA DEL CANDIDATO (FIJA ABAJO) */
-        .controls { background: white; padding: 15px; display: flex; gap: 10px; align-items: center; border-top: 1px solid #ccc; flex-shrink: 0; padding-bottom: 30px; /* Espacio extra para el iPad */ }
-        input { flex: 1; padding: 15px; border-radius: 25px; border: 1px solid #bbb; outline: none; font-size: 16px; -webkit-appearance: none; }
-        .btn-circle { background: var(--primary); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 22px; flex-shrink: 0; }
-        #mic-btn { background: #444; }
+        /* AJUSTE PARA IPAD: Más alto y con margen inferior */
+        .controls { 
+            background: white; 
+            padding: 20px 15px 40px 15px; /* Mucho margen abajo para que no se corte */
+            display: flex; 
+            gap: 10px; 
+            border-top: 2px solid var(--primary); 
+            flex-shrink: 0; 
+        }
+        input { flex: 1; padding: 15px; border-radius: 25px; border: 1px solid #bbb; font-size: 16px; }
+        .btn-circle { background: var(--primary); color: white; border: none; width: 55px; height: 55px; border-radius: 50%; font-size: 24px; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 style="margin:0; font-size: 1rem;">Señor Martín: Simulador Oral SEC</h1>
-</header>
+<header><h1 style="margin:0; font-size: 1rem;">Señor Martín: Simulador Oral SEC</h1></header>
 
 <div class="grid">
     <div class="card" id="rp1" onclick="initRP(1)">🏠 Aloj.</div>
@@ -42,77 +44,30 @@
 </div>
 
 <div id="chat">
-    <div class="bubble ex"><b>Señor Martín:</b> Bienvenido. Selecciona un Role Play arriba para comenzar el examen.</div>
+    <div class="bubble ex"><b>Señor Martín:</b> Bienvenido. Selecciona un Role Play para empezar.</div>
 </div>
 
 <div class="controls">
     <button class="btn-circle" id="mic-btn" onclick="activarMicro()">🎙️</button>
-    <input type="text" id="userInput" placeholder="Escribe tu respuesta aquí...">
+    <input type="text" id="userInput" placeholder="Responde aquí...">
     <button class="btn-circle" onclick="procesarRespuesta()">▶️</button>
 </div>
 
 <script>
-    let currentRP = null;
-    let step = 0;
-
+    let currentRP = null; let step = 0;
     const scriptData = {
-        1: ["¡Hola, dígame!", "¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña y se puede andar desde las afueras a la Plaza Mayor en media hora.", "¿Has estado alguna vez en Extremadura?", "¡Perfecto! Hemos terminado este Role Play."],
-        2: ["Buenos días. ¿En qué puedo ayudarte?", "¿Qué le ha pasado exactamente a la pantalla?", "¡Qué mala suerte! Mañana es un día importante. ¿Tienes una copia de seguridad?", "Tengo una oferta: arreglarlo hoy mismo por trescientos euros. ¿Qué te parece?", "¿Necesitas el portátil para el colegio o para la universidad?", "Examen finalizado. ¡Buen trabajo!"],
-        3: ["Hola, buenos días. ¿Quieres alquilar una autocaravana?", "¿Quién va a conducir la caravana?", "¿Tu madre ha tenido algún accidente últimamente?", "Es una zona preciosa, la tierra de Cervantes. ¿Qué ciudades queréis visitar?", "¿Cuántas personas vais a viajar en total?", "Role Play completado."],
-        4: ["¡Hola! Pareces muy contento/a. ¿Por qué?", "Es una noticia fantástica. ¿Sabes cuándo entrará en vigor la prohibición del Parlamento Europeo?", "Es verdad. ¿Qué materiales crees que se deberían usar ahora?", "En casa intentamos reciclar siempre. ¿Y tú?", "¿Crees que los jóvenes están más concienciados que los adultos?", "¡Muy bien! Hemos terminado."],
-        5: ["¡Hola, buenas tardes!", "Debes estar entre Medina del Campo y Tordesillas. ¿Hay alguna señal de tráfico por ahí?", "Claro que sí. Voy a arreglarlo todo inmediatamente. ¿Me puedes describir tu coche?", "¿Llevas mucho tiempo esperando?", "¿Es la primera vez que tienes un problema con este coche?", "Examen terminado. ¡Mucha suerte!"]
+        [span_2](start_span)1: ["¡Hola, dígame!", "¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña y se puede andar a la Plaza Mayor en media hora[span_2](end_span).", "¿Has estado alguna vez en Extremadura?", "Examen terminado."],
+        2: ["¡Hola! [span_3](start_span)¿En qué puedo ayudarte?[span_3](end_span)[span_4](start_span)", "¿Qué le ha pasado exactamente a la pantalla?[span_4](end_span)", "¡Qué mala suerte! [span_5](start_span)¿Tienes una copia de seguridad?[span_5](end_span)", "Tengo una oferta: un portátil nuevo igual al tuyo por trescientos euros. [span_6](start_span)[span_7](start_span)¿Quieres comprarlo?[span_6](end_span)[span_7](end_span)", "¿Necesitas el ordenador para el colegio?", "Buen trabajo."],
+        3: ["Hola, buenos días. [span_8](start_span)¿Quieres alquilar una autocaravana?[span_8](end_span)[span_9](start_span)", "¿Quién va a conducir la caravana?[span_9](end_span)[span_10](start_span)", "¿Tu madre tiene mucha experiencia al volante?[span_10](end_span)", "Castilla-La Mancha es preciosa. [span_11](start_span)¿Qué ciudades queréis visitar?[span_11](end_span)", "¿Cuántos sois en total?", "Role Play completado."],
+        [span_12](start_span)4: ["Pareces muy contento, ¿por qué?[span_12](end_span)", "Es una noticia fantástica. [span_13](start_span)[span_14](start_span)¿Es importante prohibir los plásticos de usar y tirar?[span_13](end_span)[span_14](end_span)[span_15](start_span)", "¿Qué otros materiales podríamos usar?[span_15](end_span)[span_16](start_span)", "¿Crees que los ciudadanos debemos cambiar nuestro estilo de vida?[span_16](end_span)[span_17](start_span)", "¿Haces tú algo para proteger el medioambiente?[span_17](end_span)", "Terminado."],
+        [span_18](start_span)5: ["¡Hola, buenas tardes[span_18](end_span)!", "Debes estar entre Medina del Campo y Tordesillas. [span_19](start_span)[span_20](start_span)¿Ves alguna señal por ahí?[span_19](end_span)[span_20](end_span)", "Voy a ayudarte. [span_21](start_span)[span_22](start_span)¿Me puedes describir tu coche?[span_21](end_span)[span_22](end_span)[span_23](start_span)", "¿Es la primera vez que tienes una avería con este coche?[span_23](end_span)", "El mecánico llegará pronto. ¡Suerte!"]
     };
 
-    function hablar(texto) {
-        window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(texto);
-        msg.lang = 'es-ES';
-        msg.rate = 0.85;
-        window.speechSynthesis.speak(msg);
-    }
-
-    function initRP(id) {
-        currentRP = id;
-        step = 0;
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-        document.getElementById('rp'+id).classList.add('active');
-        document.getElementById('chat').innerHTML = ""; // Limpiar chat al empezar
-        avanzarExamen();
-    }
-
-    function avanzarExamen() {
-        if (!currentRP || step >= scriptData[currentRP].length) return;
-        const frase = scriptData[currentRP][step];
-        const chat = document.getElementById('chat');
-        chat.innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${frase}</div>`;
-        hablar(frase);
-        chat.scrollTop = chat.scrollHeight;
-        step++;
-    }
-
-    function procesarRespuesta() {
-        const input = document.getElementById('userInput');
-        if (!input.value) return;
-        const chat = document.getElementById('chat');
-        chat.innerHTML += `<div class="bubble st">${input.value}</div>`;
-        const userText = input.value;
-        input.value = "";
-        chat.scrollTop = chat.scrollHeight;
-        setTimeout(avanzarExamen, 1500);
-    }
-
-    function activarMicro() {
-        const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
-        recognition.lang = 'es-ES';
-        recognition.onstart = () => { document.getElementById('mic-btn').style.background = 'red'; };
-        recognition.onresult = (e) => {
-            document.getElementById('userInput').value = e.results[0][0].transcript;
-            document.getElementById('mic-btn').style.background = '#444';
-            setTimeout(procesarRespuesta, 500);
-        };
-        recognition.onerror = () => { document.getElementById('mic-btn').style.background = '#444'; };
-        recognition.start();
-    }
+    function hablar(t) { window.speechSynthesis.cancel(); const m = new SpeechSynthesisUtterance(t); m.lang = 'es-ES'; m.rate = 0.8; window.speechSynthesis.speak(m); }
+    function initRP(id) { currentRP = id; step = 0; document.querySelectorAll('.card').forEach(c => c.classList.remove('active')); document.getElementById('rp'+id).classList.add('active'); document.getElementById('chat').innerHTML = ""; avanzarExamen(); }
+    function avanzarExamen() { if (!currentRP || step >= scriptData[currentRP].length) return; const f = scriptData[currentRP][step]; const chat = document.getElementById('chat'); chat.innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${f}</div>`; hablar(f); chat.scrollTop = chat.scrollHeight; step++; }
+    function procesarRespuesta() { const i = document.getElementById('userInput'); if (!i.value) return; document.getElementById('chat').innerHTML += `<div class="bubble st">${i.value}</div>`; i.value = ""; setTimeout(avanzarExamen, 1200); }
+    function activarMicro() { const r = new (window.webkitSpeechRecognition || window.Recognition)(); r.lang = 'es-ES'; r.onstart = () => document.getElementById('mic-btn').style.background = 'red'; r.onresult = (e) => { document.getElementById('userInput').value = e.results[0][0].transcript; document.getElementById('mic-btn').style.background = '#1a237e'; setTimeout(procesarRespuesta, 500); }; r.start(); }
 </script>
 </body>
 </html>
