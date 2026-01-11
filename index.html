@@ -8,25 +8,27 @@
         :root { --primary: #2c3e50; --secondary: #e74c3c; --accent: #3498db; --light-bg: #ecf0f1; --feedback: #2980b9; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--light-bg); color: #333; }
         
-        /* Estilos del Manual / Modal */
+        /* Modal de Bienvenida Amable */
         #modal-instrucciones { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:2000; }
         .modal-content { background: white; padding: 25px; border-radius: 15px; max-width: 85%; text-align: left; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-        .modal-content h2 { color: var(--secondary); margin-top: 0; text-align: center; }
-        .modal-content p { font-size: 0.95em; line-height: 1.4; }
+        .modal-content h2 { color: var(--secondary); margin-top: 0; text-align: center; font-size: 1.4em; }
+        .welcome-msg { font-style: italic; color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; text-align: center; }
+        .modal-content p { font-size: 0.95em; line-height: 1.4; margin: 8px 0; }
         .btn-close { display: block; width: 100%; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: bold; font-size: 1em; }
 
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .author-tag { font-size: 0.8em; color: #3498db; font-weight: bold; display: block; margin-top: 5px; text-transform: uppercase; }
+        header { background: var(--primary); color: white; padding: 12px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .author-tag { font-size: 0.8em; color: #3498db; font-weight: bold; display: block; margin-top: 3px; text-transform: uppercase; }
         
         .selector { display: flex; overflow-x: auto; gap: 10px; padding: 12px; background: #fff; border-bottom: 1px solid #ddd; flex-shrink: 0; }
         .rp-btn { min-width: 110px; padding: 10px; background: #fff; border: 2px solid #ddd; border-radius: 8px; font-size: 13px; cursor: pointer; text-align: center; }
         .active { border-color: var(--secondary); background: #fdf2f2; font-weight: bold; color: var(--secondary); }
         
-        #candidate-card { background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; margin: 10px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; min-height: 80px; display: none; }
-        .card-context { font-style: italic; color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 8px; font-size: 0.85em; }
+        #candidate-card { background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; margin: 10px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; min-height: 85px; display: none; }
+        .card-context { font-style: italic; color: #7f8c8d; margin-bottom: 8px; border-bottom: 1px solid #e1e1e1; padding-bottom: 5px; font-size: 0.85em; }
         .current-prompt { font-weight: bold; color: #2c3e50; background: #fdf9c4; padding: 5px; border-radius: 3px; font-size: 0.95em; padding-right: 45px; }
         
-        .btn-feedback { position: absolute; right: 8px; bottom: 8px; background: var(--feedback); color: white; border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; font-weight: bold; font-size: 18px; display: none; }
+        /* El Botón Azul */
+        .btn-feedback { position: absolute; right: 10px; bottom: 10px; background: var(--feedback); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; font-weight: bold; font-size: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10; display: none; }
 
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 16px; line-height: 1.4; }
@@ -45,12 +47,15 @@
 
 <div id="modal-instrucciones">
     <div class="modal-content">
-        <h2>How to use this Simulator</h2>
-        <p><b>1. Select a Topic:</b> Tap a scenario at the top.</p>
-        <p><b>2. Listen:</b> Tap the red <b>⏩ button</b> to hear the Examiner.</p>
-        <p><b>3. Your Turn:</b> Read the yellow card. To respond, tap the <b>microphone icon 🎤</b> on your keyboard (or type) and press the blue <b>▶️ button</b> to finish your turn. <i>*Crucial: You must send your answer to progress!</i></p>
-        <p><b>4. Need Help?</b> Tap the blue <b>?</b> button for a model answer.</p>
-        <button class="btn-close" onclick="document.getElementById('modal-instrucciones').style.display='none'">START PRACTICE</button>
+        <h2>¡Bienvenidos a TapitasSpanishIE!</h2>
+        <p class="welcome-msg">I hope you find this Role Play simulator very useful for your Leaving Cert preparation. ¡Mucho ánimo!</p>
+        
+        <p><b>1. Pick a Topic:</b> Select a scenario from the top menu.</p>
+        <p><b>2. Start:</b> Tap the red <b>⏩ button</b> to hear the Examiner.</p>
+        <p><b>3. Record/Type:</b> Read the yellow card. Tap the 🎤 on your keyboard to speak or type your answer. <b>Important:</b> Press the blue <b>▶️ button</b> to send it and finish your turn.</p>
+        <p><b>4. Feedback:</b> If you get stuck, tap the blue <b>?</b> button for a model answer.</p>
+        
+        <button class="btn-close" onclick="document.getElementById('modal-instrucciones').style.display='none'">LET'S PRACTICE!</button>
     </div>
 </div>
 
@@ -88,55 +93,34 @@
 
     const database = {
         1: {
-            context: "Vas de ERASMUS a la Universidad de Extremadura en Cáceres. Necesitas alojamiento y llamas por teléfono a la universidad.",
-            prompts: [
-                "1. Say you'll be on ERASMUS next year. Ask for accommodation advice.",
-                "2. Say you'd prefer to live near the university (Dublin outskirts experience).",
-                "3. You spent too much time travelling. If you could study that time, you'd get good grades.",
-                "4. Say climate is better than Ireland. Consider all areas even if you prefer center.",
-                "5. Answer the surprise question.",
-                "Finished."
-            ],
-            dialogs: [
-                "¡Hola, dígame!",
-                "¿En qué parte de la ciudad querrías vivir?",
-                "¿Por qué?",
-                "Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña y se puede andar desde las afueras a la Plaza Mayor en media hora.",
-                ["¿Has estado en España?", "¿Prefieres piso o residencia?"],
-                "¡Suerte!"
-            ],
-            sugerencias: [
-                "Hola, voy a ir de ERASMUS el próximo año académico. No conozco a nadie en Cáceres, ¿podría darme algún consejo?",
-                "Preferiría vivir cerca de la universidad porque el año pasado viví en las afueras de Dublín y no me gustó.",
-                "Pasaba demasiado tiempo viajando. Si pudiera dedicar ese tiempo a estudiar, sacaría mejores notas.",
-                "El clima es mucho mejor que en Irlanda, así que consideraré todas las zonas aunque prefiera el centro.",
-                "Sí, estuve el verano pasado en Valencia...",
-                ""
-            ]
+            context: "ERASMUS en Cáceres. Buscas alojamiento.",
+            prompts: ["1. Say you'll be on ERASMUS next year. Ask for advice.","2. Prefer to live near uni (Dublin outskirts experience).","3. Travelling took too much time. Need study time for good grades.","4. Climate is better. Consider all areas but prefer center.","5. Answer surprise question.","Finished."],
+            dialogs: ["¡Hola, dígame!","¿En qué parte querrías vivir?","¿Por qué?","Tienes razón. Pero Cáceres es pequeña y se puede andar desde las afueras a la Plaza Mayor en media hora.",["¿Has estado en España?","¿Piso o residencia?"],"¡Suerte!"],
+            sugerencias: ["Hola, voy a ir de ERASMUS el próximo año académico. No conozco a nadie en Cáceres, ¿podría darme algún consejo sobre el alojamiento?","Preferiría vivir cerca de la universidad porque el año pasado viví en las afueras de Dublín y no me gustó nada.","Pasaba demasiado tiempo viajando. Si pudiera dedicar ese tiempo a estudiar, sacaría mejores notas.","Bueno, el clima es mucho mejor que en Irlanda, así que consideraré todas las zonas aunque preferiría el centro.","Sí, estuve el año pasado en Madrid y me gustó mucho.",""]
         },
         2: {
-            context: "Laptop broken in Avila.",
-            prompts: ["1. Screen broken. Essay due tomorrow.", "2. Slipped and fell.", "3. Saw same for 300€.", "4. Buy if files copied + free bag.", "5. Answer question.", "Fin."],
-            dialogs: ["¡Hola!", "¿Qué pasó?", "200 euros cuesta.", "Oferta: ¿quieres?", ["¿Qué marca es?"], "Fin."],
-            sugerencias: ["Se me ha caído el portátil y la pantalla está rota. Tengo un ensayo para mañana...", "Llegaba tarde al bus, me resbalé y se cayó.", "Qué bien, pero he visto el mismo por 300 euros en el escaparate.", "Lo compro si copian mis archivos y me dan un maletín gratis.", "Es un Dell de hace dos años.", ""]
+            context: "Portátil roto en Ávila.",
+            prompts: ["1. Screen broken. Essay due tomorrow.","2. Slipped and fell running for bus.","3. Cuesta 200€? Saw same for 300€ in window.","4. Buy if files copied + free bag.","5. Answer question.","Fin."],
+            dialogs: ["¡Hola!","¿Qué pasó?","Son 200 euros.","Hay una oferta. ¿Quieres? ",["¿Qué marca es?"],"Fin."],
+            sugerencias: ["Hola, se me ha caído el portátil y la pantalla está rota. Tengo un ensayo para mañana y la única copia está aquí.","Llegaba tarde al autobús, me resbalé y el portátil se cayó al suelo.","Qué bien que se pueda arreglar, pero he visto el mismo modelo en el escaparate por 300 euros.","Lo compraré si pueden copiar mis archivos y me dan un maletín gratis.","Es un HP que compré el año pasado.",""]
         },
         3: {
             context: "Hiring a camper van.",
-            prompts: ["1. Irish student, hire for July.", "2. Mother driving.", "3. Driven on right 20 years.", "4. Castilla-La Mancha.", "5. Answer.", "Fin."],
-            dialogs: ["¡Dígame!", "Hace falta ser mayor de 25.", "Perfecto.", "¿Itinerario?", ["¿Te gusta acampar?"], "Fin."],
-            sugerencias: ["Soy un estudiante de Irlanda y quiero alquilar una autocaravana en julio.", "Mi madre conducirá porque yo no tengo carné todavía.", "Ella ha conducido por la derecha 20 años y es muy cuidadosa.", "Queremos ver la tierra de Cervantes.", "Sí, me gusta la libertad de dormir en la naturaleza.", ""]
+            prompts: ["1. Irish student, hire for July.","2. Mother driving.","3. Driven on right 20 years. Careful.","4. Castilla-La Mancha (Cervantes).","5. Answer.","Fin."],
+            dialogs: ["¡Dígame!","Mayor de 25 años.","Perfecto.","¿Itinerario?",["¿Te gusta acampar?"],"Fin."],
+            sugerencias: ["Hola, soy un estudiante de Irlanda y quiero alquilar una autocaravana dos semanas en julio.","Mi madre conducirá porque yo no tengo carné todavía.","Ella ha conducido por la derecha 20 años y es muy cuidadosa.","Esperamos viajar por Castilla-La Mancha para ver la tierra de Cervantes.","Sí, me gusta mucho porque es más aventurero.",""]
         },
         4: {
             context: "Plastic pollution.",
-            prompts: ["1. EU ban plastics.", "2. Essential for waters.", "3. Recycled paper.", "4. Citizens responsibility.", "5. Answer.", "Fin."],
-            dialogs: ["¿Por qué estás contento?", "¿Es importante prohibir?", "¿Algo más?", "¿Y ya está?", ["¿Recicláis en el colegio?"], "Fin."],
-            sugerencias: ["La UE va a prohibir los plásticos de un solo uso.", "Es esencial para los océanos.", "Podemos usar materiales biodegradables.", "Los ciudadanos deben ser responsables e ir en bici.", "Sí, reciclamos papel y latas.", ""]
+            prompts: ["1. EU ban plastics.","2. Essential for waters.","3. Recycled paper.","4. Citizens responsibility.","5. Answer.","Fin."],
+            dialogs: ["¿Por qué estás contento?","¿Es importante?","¿Algo más?","¿Y ya está?",["¿Recicláis en el colegio?"],"Fin."],
+            sugerencias: ["La UE ha acordado prohibir los plásticos de un solo uso.","Es esencial para el agua. El plástico es un problema serio en los océanos.","Podemos usar papel reciclado o materiales biodegradables.","Los ciudadanos deben ser responsables e ir más en bici o caminar.","Sí, tenemos contenedores de diferentes colores.",""]
         },
         5: {
-            context: "Car breakdown on AP-6.",
-            prompts: ["1. Broken down on AP-6.", "2. Exit 156. Ask for mechanic.", "3. Replacement car (Lugo).", "4. Red SEAT Ibiza (from aunt).", "5. Answer.", "Fin."],
-            dialogs: ["Buenas tardes.", "¿Alguna señal?", "Enviaré ayuda.", "¿Cómo es el coche?", ["¿Sabes cambiar ruedas?"], "Fin."],
-            sugerencias: ["Mi coche se ha averiado en la AP-6. Pasé el peaje hace media hora.", "Veo la señal 156. ¿Puede enviarme una grúa?", "¿Puedo tener un coche de sustitución para ir a Lugo?", "Es un SEAT Ibiza rojo que le compré a mi tía.", "No, nunca lo he intentado.", ""]
+            context: "Car breakdown AP-6.",
+            prompts: ["1. Broken down AP-6.","2. Exit 156. Mechanic.","3. Replacement car (Lugo).","4. Red SEAT Ibiza (aunt).","5. Answer.","Fin."],
+            dialogs: ["Buenas tardes.","¿Alguna señal?","Enviaré ayuda.","¿Cómo es el coche?",["¿Sabes cambiar ruedas?"],"Fin."],
+            sugerencias: ["Mi coche se ha averiado en la AP-6. Pasé el peaje hace media hora.","Veo la señal 156. ¿Puede enviarme una grúa? Es serio.","¿Me pueden dar un coche de sustitución para ir a Lugo?","Es un SEAT Ibiza rojo que le compré a mi tía.","No, me parece muy difícil y peligroso.",""]
         }
     };
 
@@ -144,6 +128,7 @@
         document.getElementById('userInput').disabled = !enabled;
         document.getElementById('sendBtn').disabled = !enabled;
         document.getElementById('feedbackBtn').style.display = enabled ? "block" : "none";
+        document.getElementById('userInput').placeholder = enabled ? "Speak or type..." : "Waiting...";
     }
 
     function seleccionarRP(id) {
@@ -153,7 +138,7 @@
         document.getElementById('b' + id).classList.add('active');
         document.getElementById('candidate-card').style.display = "block";
         document.getElementById('card-context').innerHTML = database[id].context;
-        document.getElementById('current-prompt').innerHTML = "Tap the RED BUTTON to hear the Examiner.";
+        document.getElementById('current-prompt').innerHTML = "Tap the RED BUTTON to begin.";
         document.getElementById('chat').innerHTML = "";
         document.getElementById('next-trigger').style.display = "block";
         setInputEnabled(false);
@@ -162,7 +147,10 @@
     function mostrarSugerencia() {
         const sug = database[rpActual].sugerencias[pasoActual];
         if(sug) {
-            document.getElementById('chat').innerHTML += `<div class="feedback-box">💡 <b>Model:</b> ${sug}</div>`;
+            const fb = document.createElement('div');
+            fb.className = 'feedback-box';
+            fb.innerHTML = `💡 <b>Model Answer:</b> ${sug}`;
+            document.getElementById('chat').appendChild(fb);
             document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
         }
     }
@@ -172,19 +160,21 @@
         const input = document.getElementById('userInput');
         const texto = input.value.trim();
         if (!texto) return;
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance("")); 
+
         document.getElementById('chat').innerHTML += `<div class="bubble st">${texto}</div>`;
         input.value = "";
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+        
         setInputEnabled(false);
-        pasoActual++;
-        setTimeout(() => { document.getElementById('next-trigger').style.display = "block"; }, 300);
+        pasoActual++; 
+        setTimeout(() => { document.getElementById('next-trigger').style.display = "block"; }, 400);
     }
 
     function proximaIntervencion() {
         if (!rpActual || speaking) return;
         document.getElementById('next-trigger').style.display = "none";
         speaking = true;
+
         let t = database[rpActual].dialogs[pasoActual];
         let audioPath = "";
 
@@ -204,10 +194,12 @@
             speaking = false;
             if (pasoActual < database[rpActual].dialogs.length - 1) setInputEnabled(true);
         };
+
         new Audio(audioPath).play().then(a => a.onended = finalizarTurno).catch(() => hablarRobot(t, finalizarTurno));
     }
 
     function hablarRobot(texto, cb) {
+        window.speechSynthesis.cancel();
         const m = new SpeechSynthesisUtterance(texto);
         m.lang = 'es-ES'; m.onend = cb;
         window.speechSynthesis.speak(m);
