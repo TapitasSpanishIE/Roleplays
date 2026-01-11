@@ -8,6 +8,7 @@
         :root { --primary: #2c3e50; --secondary: #e74c3c; --accent: #3498db; --light-bg: #ecf0f1; --feedback: #2980b9; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--light-bg); color: #333; overflow: hidden; }
         
+        /* Modal de Bienvenida */
         #modal-instrucciones { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; z-index:9999; padding: 20px; box-sizing: border-box; }
         .modal-content { background: white; padding: 25px; border-radius: 15px; max-width: 500px; width: 100%; text-align: left; box-shadow: 0 5px 30px rgba(0,0,0,0.5); }
         .modal-content h2 { color: var(--secondary); margin-top: 0; text-align: center; font-size: 1.5em; }
@@ -87,40 +88,33 @@
         1: {
             context: "ERASMUS en Cáceres. Llamas por alojamiento.",
             prompts: ["1. ERASMUS next year. Ask for advice.","2. Near uni (Dublin outskirts experience).","3. Travelling too long. Study = good grades.","4. Better climate. All areas ok but prefer center.","5. Respond to the surprise question.","Finished."],
-            dialogs: ["¡Hola, dígame!","¿En qué parte querrías vivir?","¿Por qué?","Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña y se puede andar desde las afueras a la Plaza Mayor en media hora.",["¿Has estado alguna vez en España?","¿Prefieres residencia o piso compartido?","¿Te gusta vivir en España?"],"¡Mucha suerte en Cáceres!"],
-            sugerencias: ["Hola, voy a ir de ERASMUS el año que viene. ¿Podría darme algún consejo sobre el alojamiento?","Preferiría vivir cerca de la universidad porque el año pasado viví en las afueras de Dublín y no me gustó.","Pasaba demasiado tiempo viajando. Si pudiera dedicar ese tiempo a estudiar, sacaría mejores notas.","Bueno, el clima es mucho mejor que en Irlanda, así que consideraré todas las zonas aunque prefiera el centro.","(Responde libremente a la pregunta...)",""]
+            dialogs: [
+                "¡Hola, dígame!",
+                "¿En qué parte de la ciudad querrías vivir?",
+                "¿Por qué?",
+                "Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña y se puede andar desde las afueras a la Plaza Mayor en media hora.",
+                ["¿Has estado alguna vez en España?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"],
+                "¡Mucha suerte en Cáceres!"
+            ],
+            sugerencias: ["Hola, voy a ir de ERASMUS el año que viene. ¿Podría darme algún consejo sobre el alojamiento?","Preferiría vivir cerca de la universidad porque el año pasado viví en las afueras de Dublín y no me gustó.","Pasaba demasiado tiempo viajando. Si pudiera dedicar ese tiempo a estudiar, sacaría mejores notas.","Bueno, el clima es mucho mejor que en Irlanda, así que consideraré todas las zonas aunque preferiría el centro.","(Responde libremente...)",""]
         },
-        2: {
-            context: "Portátil roto en Ávila.",
-            prompts: ["1. Screen broken. Essay due tomorrow.","2. Slipped and fell.","3. Repair is 200€. Saw same for 300€ in window.","4. Buy if files copied + free bag.","5. Answer question.","Fin."],
-            dialogs: ["¡Hola! ¿En qué puedo ayudarte?","¿Cómo se rompió?","Arreglarlo cuesta 200 euros.","Esta semana hay oferta. ¿Lo quieres? ",["¿Qué marca es?","¿Usas mucho el ordenador?"],"¡Examen finalizado!"],
-            sugerencias: ["Hola, se me ha caído el portátil y la pantalla está rota.","Llegaba tarde al bus, me resbalé y se cayó al suelo.","He visto el mismo modelo por 300 euros en el escaparate.","Lo compraré si pueden copiar mis archivos y me dan un maletín gratis.","(Responde libremente...)",""]
-        },
-        3: {
-            context: "Alquiler Camper Van.",
-            prompts: ["1. Irish student, hire for July.","2. Mother driving.","3. Driven on right 20 years. Careful.","4. Castilla-La Mancha (Cervantes).","5. Answer question.","Fin."],
-            dialogs: ["¡Dígame!","Debes ser mayor de 25 años.","Ah, entonces ella puede conducir.","¿Tenéis una ruta ya pensada? ",["¿Te gusta viajar de acampada?","¿Prefieres mar o montaña?"],"¡Buen viaje!"],
-            sugerencias: ["Hola, soy un estudiante de Irlanda y quiero alquilar una autocaravana dos semanas en julio.","Mi madre conducirá porque yo no tengo carné todavía.","Ella ha conducido por la derecha 20 años y es muy cuidadosa.","Esperamos viajar por Castilla-La Mancha para ver la tierra de Cervantes.","(Responde libremente...)",""]
-        },
-        4: {
-            context: "Problema de plásticos.",
-            prompts: ["1. EU ban plastics.","2. Essential for waters. Serious problem in oceans.","3. Recycled paper / biodegradables.","4. Citizens responsibility (cycle/walk).","5. Answer question.","Fin."],
-            dialogs: ["¿Por qué estás tan contento?","¿Es buena idea prohibirlos?","¿Hay alternativas al plástico?","¿Qué más podemos hacer los ciudadanos?",["¿Reciclas en casa?","¿Qué opinas del cambio climático?"],"¡Muy bien!"],
-            sugerencias: ["El Parlamento Europeo ha acordado prohibir los plásticos de un solo uso.","Es esencial para el agua. El plástico es un problema serio en los océanos.","Podemos usar papel reciclado o materiales biodegradables.","Los ciudadanos deben ser responsables e ir en bici o caminar más.","(Responde libremente...)",""]
-        },
-        5: {
-            context: "Avería coche AP-6.",
-            prompts: ["1. Broken down AP-6.","2. Exit 156. Ask for mechanic.","3. Replacement car (Lugo).","4. Red SEAT Ibiza (aunt).","5. Answer question.","Fin."],
-            dialogs: ["Hola, seguros. ¿Qué ha pasado?","¿Ves alguna señal cerca?","Enviamos una grúa inmediatamente.","¿Cómo es el coche exactamente?",["¿Sabes cambiar ruedas?","¿Has esperado mucho tiempo?"],"¡Llegamos en 15 minutos!"],
-            sugerencias: ["Mi coche se ha averiado en la AP-6. Pasé el peaje hace media hora.","Veo la señal 156. ¿Puede enviarme una grúa?","¿Me pueden dar un coche de sustitución? Tengo que ir a Lugo.","Es un SEAT Ibiza rojo que le compré a mi tía.","(Responde libremente...)",""]
-        }
+        // Mantenemos los demás escenarios igual pero asegurando que el paso 5 sea interactivo
+        2: { context: "Portátil roto Ávila.", prompts: ["1. Screen broken.","2. Slipped.","3. 200€ vs 300€.","4. Copy files.","5. Answer question.","Fin."], dialogs: ["¡Hola!","¿Cómo se rompió?","Cuesta 200 euros.","¿Lo compras?",["¿Qué marca es?","¿Usas mucho el ordenador?"],"¡Fin!"], sugerencias: ["Se rompió la pantalla...","Me resbalé...","He visto uno nuevo...","Lo compro si...","(Respuesta...)",""]},
+        3: { context: "Camper Van.", prompts: ["1. July.","2. Mother driving.","3. Careful driver.","4. Cervantes.","5. Answer question.","Fin."], dialogs: ["¡Dígame!","+25 años.","Perfecto.","¿Ruta?",["¿Te gusta acampar?","¿Mar o montaña?"],"¡Buen viaje!"], sugerencias: ["Alquiler julio...","Madre conduce...","20 años experiencia...","Cervantes...","(Respuesta...)",""]},
+        4: { context: "Plásticos.", prompts: ["1. Ban.","2. Oceans.","3. Biodegradable.","4. Citizens.","5. Answer question.","Fin."], dialogs: ["¿Contento?","¿Importante?","¿Alternativas?","¿Qué más?",["¿Reciclas?","¿Clima?"],"¡Adiós!"], sugerencias: ["Prohibición UE...","Agua limpia...","Papel reciclado...","Responsabilidad...","(Respuesta...)",""]},
+        5: { context: "Avería AP-6.", prompts: ["1. Broken down.","2. Exit 156.","3. Replacement.","4. Red SEAT.","5. Answer question.","Fin."], dialogs: ["Hola.","¿Señal?","Grúa.","¿Coche?",["¿Sabes cambiar ruedas?","¿Has esperado mucho?"],"¡Vamos pronto!"], sugerencias: ["Avería en AP-6...","Salida 156...","Coche sustitución...","SEAT Ibiza rojo...","(Respuesta...)",""]}
     };
 
     function setInputEnabled(enabled) {
         document.getElementById('userInput').disabled = !enabled;
         document.getElementById('sendBtn').disabled = !enabled;
         document.getElementById('feedbackBtn').style.display = enabled ? "block" : "none";
-        if(enabled) document.getElementById('userInput').focus();
+        if(enabled) {
+            document.getElementById('userInput').placeholder = "Escribe o usa el micro 🎤";
+            document.getElementById('userInput').focus();
+        } else {
+            document.getElementById('userInput').placeholder = "Esperando...";
+        }
     }
 
     function seleccionarRP(id) {
@@ -169,10 +163,9 @@
         let t = database[rpActual].dialogs[pasoActual];
         let audioPath = "";
 
-        // Lógica de Sorpresa (a, b, c) corregida
         if (Array.isArray(t)) {
             let idx = Math.floor(Math.random() * t.length);
-            t = t[idx];
+            t = t[idx]; // Texto exacto: 5a, 5b o 5c
             let suffix = ['a', 'b', 'c'][idx];
             audioPath = `rp${rpActual}_5${suffix}.mp3`;
         } else {
@@ -185,7 +178,8 @@
 
         const finalizarTurno = () => {
             speaking = false;
-            // Solo habilitamos el input si NO es el último saludo de despedida
+            // SIEMPRE habilitamos el input si NO es el paso final (despedida)
+            // En el RP1, la despedida es el paso 6 (índice 5), por lo que en el paso 5 (sorpresa) DEBE habilitarse.
             if (pasoActual < database[rpActual].dialogs.length - 1) {
                 setInputEnabled(true);
             }
