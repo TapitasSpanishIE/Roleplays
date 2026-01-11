@@ -11,20 +11,20 @@
         .author-tag { font-size: 0.8em; color: #3498db; font-weight: bold; display: block; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
         .selector { display: flex; overflow-x: auto; gap: 10px; padding: 12px; background: #fff; border-bottom: 1px solid #ddd; flex-shrink: 0; }
         .rp-btn { min-width: 110px; padding: 10px; background: #fff; border: 2px solid #ddd; border-radius: 8px; font-size: 13px; cursor: pointer; text-align: center; }
-        .active { border-color: var(--secondary); background: #fdf2f2; font-weight: bold; color: var(--secondary); }
+        .active { border-color: var(--secondary); background: #fdf2f2; font-weight: bold; color: var(--secondary); transform: scale(1.02); }
         #candidate-card { background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; margin: 10px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; min-height: 80px; display: none; }
         .card-context { font-style: italic; color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 8px; font-size: 0.85em; line-height: 1.3; }
         .current-prompt { font-weight: bold; color: #2c3e50; background: #fdf9c4; padding: 5px; border-radius: 3px; font-size: 0.95em; padding-right: 45px; line-height: 1.3; }
-        .btn-feedback { position: absolute; right: 8px; bottom: 8px; background: var(--feedback); color: white; border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; font-weight: bold; font-size: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .btn-feedback { position: absolute; right: 8px; bottom: 8px; background: var(--feedback); color: white; border: none; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; font-weight: bold; font-size: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); display: none; }
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 16px; line-height: 1.4; }
-        .ex { align-self: flex-start; background: white; border: 1px solid #dee2e6; border-bottom-left-radius: 2px; }
-        .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; }
+        .ex { align-self: flex-start; background: white; border: 1px solid #dee2e6; }
+        .st { align-self: flex-end; background: #dcf8c6; }
         .feedback-box { font-size: 0.85em; color: var(--feedback); background: #e1f5fe; padding: 10px; border-radius: 8px; border-left: 4px solid var(--feedback); margin: 5px 0; align-self: center; width: 90%; }
         #next-trigger { display: none; margin: 10px auto; padding: 14px 24px; background: var(--secondary); color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; width: 85%; font-size: 16px; }
         .input-area { background: white; padding: 15px 15px 35px 15px; display: flex; gap: 10px; border-top: 1px solid #ddd; }
         input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #ccc; font-size: 16px; outline: none; }
-        .btn-send { background: var(--accent); color: white; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .btn-send { background: var(--accent); color: white; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 20px; }
     </style>
 </head>
 <body>
@@ -52,7 +52,7 @@
 <button id="next-trigger" onclick="proximaIntervencion()">Tap to hear Examiner ⏩</button>
 
 <div class="input-area">
-    <input type="text" id="userInput" placeholder="Select scenario..." disabled>
+    <input type="text" id="userInput" placeholder="Selecciona un escenario..." disabled>
     <button class="btn-send" id="sendBtn" onclick="enviarRespuesta()" disabled>▶️</button>
 </div>
 
@@ -63,21 +63,21 @@
 
     const database = {
         1: {
-            context: "Vas de ERASMUS a Cáceres. Necesitas alojamiento y llamas por teléfono a la universidad.",
+            context: "Vas de ERASMUS a la Universidad de Extremadura en Cáceres. Necesitas alojamiento y llamas por teléfono a la universidad.",
             prompts: [
                 "1. Say you'll be on ERASMUS next year. You don't know anybody in Caceres and ask for advice about accommodation.",
-                "2. Say you'd prefer to live near the university (Dublin outskirts experience).",
-                "3. You spent too much time travelling. If you could spend that time studying, you'd get good grades.",
-                "4. Say the climate is better than Ireland. You'll consider all areas even if you prefer the center.",
+                "2. Say you'd prefer to live near the university because last year you lived in the outskirts of Dublin and really didn't like it.",
+                "3. Say you spent too much time travelling. If you could spend that time studying, you'd get good grades.",
+                "4. Say the climate is much better than Ireland. You'll consider all areas even if you prefer the center.",
                 "5. Answer the examiner's question.",
-                "Role play finished."
+                "Fin de la prueba."
             ],
             dialogs: [
                 "¡Hola, dígame!",
                 "¿En qué parte de la ciudad querrías vivir?",
                 "¿Por qué?",
                 "Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña y se puede andar desde las afueras a la Plaza Mayor en media hora.",
-                ["¿Has estado alguna vez en España?", "¿Te gusta vivir en España?"],
+                ["¿Has estado alguna vez en España?", "¿Prefieres residencia o piso compartido?", "¿Te gusta vivir en España?"],
                 "¡Mucha suerte en Cáceres!"
             ],
             sugerencias: [
@@ -85,44 +85,97 @@
                 "Preferiría vivir cerca de la universidad porque el año pasado viví en las afueras de Dublín y no me gustó nada.",
                 "Es que pasaba demasiado tiempo viajando. Si pudiera dedicar ese tiempo a estudiar, sacaría mejores notas.",
                 "Bueno, el clima es mucho mejor que en Irlanda, así que consideraré todas las zonas aunque preferiría el centro.",
-                "Sí, he estado en Madrid y me gusta mucho la comida española...",
+                "(Responde libremente según la pregunta)",
                 ""
             ]
         },
-        // He ajustado la lógica para que los demás escenarios sigan este mismo orden estricto
         2: {
-            context: "Laptop broken in Avila.",
-            prompts: ["1. Screen broken. Essay due tomorrow.", "2. Slipped and fell.", "3. Saw same model for 300€.", "4. Buy if files copied + free bag.", "5. Answer question.", "Fin."],
-            dialogs: ["¡Hola! ¿En qué puedo?", "¿Qué pasó?", "Pantalla nueva: 200€.", "Oferta: ¿quieres comprarlo?", ["¿Mac o PC?"], "Fin."],
-            sugerencias: ["Hola, se me ha caído el portátil y la pantalla está rota. Tengo un ensayo para mañana...", "Es que llegaba tarde al autobús, me resbalé y se cayó.", "Qué bien, pero he visto el mismo modelo por 300€ en el escaparate.", "Lo compraré si pueden copiar mis archivos y me dan un maletín gratis.", "Uso el ordenador todos los días para estudiar.", ""]
+            context: "Estás en Ávila y se te ha roto el portátil. Lo llevas a arreglar.",
+            prompts: [
+                "1. Screen broken. Essay due tomorrow (only copy).",
+                "2. Slipped and fell while running for the bus.",
+                "3. Cuesta 200€? You saw same model for 300€ in window.",
+                "4. Buy it if they copy files + free bag.",
+                "5. Answer question.",
+                "Fin."
+            ],
+            dialogs: ["¡Hola! ¿En qué puedo ayudarte?", "¿Qué le pasó?", "Necesitas una pantalla nueva. Son 200 euros.", "Hay una oferta. ¿Quieres comprarlo?", ["¿Usas mucho el ordenador?", "¿Qué marca es?"], "Examen finalizado."],
+            sugerencias: [
+                "Hola, se me ha caído el portátil y la pantalla está rota. Tengo un ensayo para mañana y la única copia está aquí.",
+                "Es que llegaba tarde al autobús, me resbalé y el portátil se cayó al suelo.",
+                "Qué bien que se pueda arreglar, pero he visto el mismo modelo en el escaparate por 300 euros.",
+                "Lo compraré si pueden copiar mis archivos y me dan un maletín gratis.",
+                "Lo uso todos los días para mis estudios y para ver series.",
+                ""
+            ]
         },
         3: {
-            context: "Camper van hiring.",
-            prompts: ["1. Student, hire camper for July.", "2. Mother driving.", "3. Driven on right 20 years.", "4. Castilla-La Mancha (Cervantes).", "5. Answer question.", "Fin."],
-            dialogs: ["¡Dígame!", "Hace falta ser mayor de 25.", "Perfecto.", "¿Tenéis itinerario?", ["¿Te gusta acampar?"], "Fin."],
-            sugerencias: ["Hola, soy un estudiante de Irlanda y quiero alquilar una autocaravana dos semanas en julio.", "Mi madre conducirá porque yo no tengo carné todavía.", "Ella ha conducido por la derecha en Europa durante 20 años y es muy cuidadosa.", "Queremos ir por Castilla-La Mancha para ver la tierra de Cervantes.", "Me encanta acampar porque estás en contacto con la naturaleza.", ""]
+            context: "Alquiler de autocaravana para julio.",
+            prompts: [
+                "1. Irish student, hire camper for 2 weeks in July.",
+                "2. Mother driving (no licence yet).",
+                "3. Driven on right 20 years. Careful driver.",
+                "4. Travel through Castilla-La Mancha (Cervantes).",
+                "5. Answer question.",
+                "Fin."
+            ],
+            dialogs: ["¡Dígame!", "Hace falta ser mayor de 25 años.", "Perfecto, ella puede conducir.", "¿Tenéis itinerario?", ["¿Te gusta acampar?", "¿Mar o montaña?"], "¡Buen viaje!"],
+            sugerencias: [
+                "Hola, soy un estudiante de Irlanda y estoy interesado en alquilar una autocaravana dos semanas en julio.",
+                "Mi madre conducirá porque yo no tengo carné todavía. Estoy recibiendo clases.",
+                "Ella ha conducido por la derecha en Europa durante 20 años y es una conductora muy cuidadosa.",
+                "Esperamos viajar por Castilla-La Mancha para ver la tierra de Cervantes.",
+                "Me encanta acampar porque prefiero estar al aire libre.",
+                ""
+            ]
         },
         4: {
-            context: "Plastic pollution.",
-            prompts: ["1. EU ban plastics.", "2. Essential for waters.", "3. Recycled paper.", "4. Citizens responsibility.", "5. Answer question.", "Fin."],
-            dialogs: ["¿Por qué estás contento?", "¿Es importante prohibir plásticos?", "¿Algo más?", "¿Y ya está?", ["¿Recicláis en el colegio?"], "Fin."],
-            sugerencias: ["El Parlamento Europeo ha acordado prohibir los plásticos de un solo uso.", "Es esencial y bueno para el agua. El plástico es un problema serio en ríos y océanos.", "Podemos usar papel reciclado o materiales biodegradables.", "No, los ciudadanos deben ser más responsables e ir más en bici.", "Sí, en mi escuela tenemos contenedores para papel y plástico.", ""]
+            context: "Noticias sobre plásticos de un solo uso.",
+            prompts: [
+                "1. EU ban plastics.",
+                "2. Essential for waters. Serious problem in oceans.",
+                "3. Recycled paper / biodegradables.",
+                "4. Citizens responsibility (cycle/walk).",
+                "5. Answer question.",
+                "Fin."
+            ],
+            dialogs: ["¿Por qué estás tan contento?", "¿Es importante prohibir plásticos?", "¿Podemos hacer algo más?", "¿Y ya está?", ["¿Recicláis en tu instituto?", "¿Qué opinas del clima?"], "¡Muy bien!"],
+            sugerencias: [
+                "El Parlamento Europeo ha acordado prohibir los plásticos de un solo uso como pajitas y cubiertos.",
+                "Es esencial y será bueno para el agua. El plástico es un problema muy serio en ríos y océanos.",
+                "Podemos usar papel reciclado o materiales biodegradables en lugar de plástico.",
+                "No, los ciudadanos necesitan ser más responsables. Podríamos ir en bici o caminar más.",
+                "Sí, en mi colegio tenemos varios contenedores para reciclar todo.",
+                ""
+            ]
         },
         5: {
-            context: "Car breakdown AP-6.",
-            prompts: ["1. Broken down AP-6.", "2. Exit 156. Mechanic/Tow truck.", "3. Replacement car (Lugo).", "4. Red SEAT Ibiza (bought from aunt).", "5. Answer question.", "Fin."],
-            dialogs: ["Buenas tardes.", "¿Alguna señal?", "Arreglado.", "¿Cómo es el coche?", ["¿Sabes cambiar ruedas?"], "Fin."],
-            sugerencias: ["Hola, mi coche se ha averiado en la AP-6. Pasé el peaje hace media hora.", "Veo la señal de salida 156. ¿Puede enviarme una grúa? Es serio.", "¿Me pueden dar un coche de sustitución? Tengo que recoger a mis padres en Lugo.", "Es un SEAT Ibiza rojo. Se lo compré a mi tía y nunca me dio problemas.", "No, no sé cambiarla, es muy difícil.", ""]
+            context: "Avería de coche en la AP-6.",
+            prompts: [
+                "1. Broken down on AP-6.",
+                "2. Exit 156. Ask for mechanic.",
+                "3. Replacement car (Lugo airport).",
+                "4. Red SEAT Ibiza (from aunt).",
+                "5. Answer question.",
+                "Fin."
+            ],
+            dialogs: ["Buenas tardes, seguros.", "¿Alguna señal cerca?", "Voy a enviar ayuda.", "¿Cómo es su coche?", ["¿Sabe cambiar una rueda?", "¿Ha esperado mucho?"], "Llegamos pronto."],
+            sugerencias: [
+                "Hola, mi coche se ha averiado en la AP-6. Pasé el peaje hace media hora.",
+                "Veo la señal de salida 156. ¿Podría enviarme un mecánico o una grúa? Es serio.",
+                "¿Podría darme un coche de sustitución para ir a Lugo? Tengo que recoger a mis padres.",
+                "Es un SEAT Ibiza rojo, matrícula 4620 CFK. Se lo compré a mi tía.",
+                "No, no sé cambiarla, es muy difícil y peligroso.",
+                ""
+            ]
         }
     };
 
     function setInputEnabled(enabled) {
-        const input = document.getElementById('userInput');
-        const btn = document.getElementById('sendBtn');
-        input.disabled = !enabled;
-        btn.disabled = !enabled;
-        input.placeholder = enabled ? "Escribe tu respuesta..." : "Esperando...";
+        document.getElementById('userInput').disabled = !enabled;
+        document.getElementById('sendBtn').disabled = !enabled;
         document.getElementById('feedbackBtn').style.display = enabled ? "block" : "none";
+        document.getElementById('userInput').placeholder = enabled ? "Escribe aquí..." : "Esperando...";
     }
 
     function seleccionarRP(id) {
@@ -132,7 +185,7 @@
         document.getElementById('b' + id).classList.add('active');
         document.getElementById('candidate-card').style.display = "block";
         document.getElementById('card-context').innerHTML = database[id].context;
-        document.getElementById('current-prompt').innerHTML = "Pulsa el BOTÓN ROJO para que hable el examinador.";
+        document.getElementById('current-prompt').innerHTML = "Pulsa el BOTÓN ROJO para oír al examinador.";
         document.getElementById('chat').innerHTML = "";
         document.getElementById('next-trigger').style.display = "block";
         setInputEnabled(false);
@@ -158,8 +211,8 @@
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
         
         setInputEnabled(false);
-        pasoActual++; // Avanzamos el paso después de que el alumno responda
-        setTimeout(() => { document.getElementById('next-trigger').style.display = "block"; }, 300);
+        pasoActual++; 
+        setTimeout(() => { document.getElementById('next-trigger').style.display = "block"; }, 400);
     }
 
     function proximaIntervencion() {
@@ -178,26 +231,23 @@
             audioPath = `rp${rpActual}_${pasoActual + 1}.mp3`;
         }
 
-        document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
-        document.getElementById('current-prompt').innerHTML = `<b>Prompt actual:</b> ${database[rpActual].prompts[pasoActual]}`;
+        document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Ex:</b> ${t}</div>`;
+        document.getElementById('current-prompt').innerHTML = `<b>Prompt:</b> ${database[rpActual].prompts[pasoActual]}`;
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
         const finalizarTurno = () => {
             speaking = false;
-            if (pasoActual < database[rpActual].dialogs.length - 1) {
-                setInputEnabled(true);
-            }
+            if (pasoActual < database[rpActual].dialogs.length - 1) setInputEnabled(true);
         };
 
         const audio = new Audio(audioPath);
         audio.play().then(() => { audio.onended = finalizarTurno; }).catch(() => { hablarRobot(t, finalizarTurno); });
     }
 
-    function hablarRobot(texto, onEndCb) {
+    function hablarRobot(texto, cb) {
         window.speechSynthesis.cancel();
         const m = new SpeechSynthesisUtterance(texto);
-        m.lang = 'es-ES'; m.rate = 0.85;
-        m.onend = onEndCb;
+        m.lang = 'es-ES'; m.rate = 0.85; m.onend = cb;
         window.speechSynthesis.speak(m);
     }
 </script>
