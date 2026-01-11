@@ -81,14 +81,13 @@
         document.querySelectorAll('.rp-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('b' + id).classList.add('active');
 
-        document.getElementById('chat').innerHTML = '<div class="bubble ex">Escenario seleccionado. Pulsa el botón rojo para empezar el examen.</div>';
+        document.getElementById('chat').innerHTML = '<div class="bubble ex">Escenario seleccionado. Pulsa el botón rojo para empezar.</div>';
         document.getElementById('next-trigger').style.display = "block";
         setInputEnabled(false);
     }
 
     function enviarRespuesta() {
         if (!rpActual || speaking || !esperandoRespuesta) return;
-
         const input = document.getElementById('userInput');
         const texto = input.value.trim();
         if (!texto) return;
@@ -105,26 +104,22 @@
         }
     }
 
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') enviarRespuesta();
-    });
-
     function proximaIntervencion() {
         if (!rpActual || speaking) return;
-
         document.getElementById('next-trigger').style.display = "none";
         let t = contenido[rpActual][pasoActual];
         let nombreAudio = "";
 
+        // Generar nombre de archivo con extensión .mp3
         if (pasoActual === 4) {
             let letras = ['a', 'b', 'c'];
             let r = Math.floor(Math.random() * 3);
             t = contenido[rpActual][4][r];
-            nombreAudio = `rp${rpActual}_5${letras[r]}.m4a`;
+            nombreAudio = `rp${rpActual}_5${letras[r]}.mp3`;
         } else if (pasoActual === 5) {
-            nombreAudio = `rp${rpActual}_6.m4a`;
+            nombreAudio = `rp${rpActual}_6.mp3`;
         } else {
-            nombreAudio = `rp${rpActual}_${pasoActual + 1}.m4a`;
+            nombreAudio = `rp${rpActual}_${pasoActual + 1}.mp3`;
         }
 
         document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
@@ -145,16 +140,8 @@
         if (rpActual === 1) {
             const audio = new Audio(nombreAudio);
             audio.onended = finalizarTurno;
-            
-            // Si el archivo no carga o no existe, solo entonces usamos el robot
-            audio.onerror = () => {
-                hablarRobot(t, finalizarTurno);
-            };
-
-            audio.play().catch(() => {
-                // Fallback por si el iPad bloquea el primer clic
-                hablarRobot(t, finalizarTurno);
-            });
+            audio.onerror = () => hablarRobot(t, finalizarTurno);
+            audio.play().catch(() => hablarRobot(t, finalizarTurno));
         } else {
             hablarRobot(t, finalizarTurno);
         }
@@ -168,6 +155,10 @@
         m.onend = () => { if (onEndCb) onEndCb(); };
         window.speechSynthesis.speak(m);
     }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') enviarRespuesta();
+    });
 </script>
 </body>
 </html>
