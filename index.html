@@ -100,13 +100,11 @@
         esperandoRespuesta = false;
         setInputEnabled(false);
 
-        // Tras responder, SIEMPRE mostramos el botón rojo para asegurar el audio en iPad
         if (pasoActual < contenido[rpActual].length) {
             document.getElementById('next-trigger').style.display = "block";
         }
     }
 
-    // Permitir enviar con Enter
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') enviarRespuesta();
     });
@@ -147,8 +145,16 @@
         if (rpActual === 1) {
             const audio = new Audio(nombreAudio);
             audio.onended = finalizarTurno;
-            audio.onerror = () => hablarRobot(t, finalizarTurno);
-            audio.play().catch(() => hablarRobot(t, finalizarTurno));
+            
+            // Si el archivo no carga o no existe, solo entonces usamos el robot
+            audio.onerror = () => {
+                hablarRobot(t, finalizarTurno);
+            };
+
+            audio.play().catch(() => {
+                // Fallback por si el iPad bloquea el primer clic
+                hablarRobot(t, finalizarTurno);
+            });
         } else {
             hablarRobot(t, finalizarTurno);
         }
