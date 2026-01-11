@@ -43,54 +43,20 @@
 <script>
     let current = null; 
     let step = 0;
+    let audioContext;
 
     const data = {
-        1: [
-            "¡Hola, dígame!", 
-            "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", 
-            "¿Por qué?", 
-            "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.",
-            ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"],
-            "Hemos terminado, gracias."
-        ],
-        2: [
-            "Buenos días. ¿En qué puedo ayudarte?", 
-            "Veo que tienes un problema con el portátil. ¿Qué le ha pasado exactamente a la pantalla?", 
-            "¡Qué mala suerte! Y mañana es un día importante. ¿Tienes una copia de seguridad de tus archivos?", 
-            "Mira, tengo una oferta: te lo puedo arreglar hoy mismo por trescientos euros. ¿Qué te parece?", 
-            ["¿Usas mucho el portátil para tus estudios?", "¿Prefieres Mac o Windows?", "¿Has tenido problemas técnicos antes?"],
-            "Examen finalizado. ¡Buen trabajo!"
-        ],
-        3: [
-            "Hola, buenos días. ¿Quieres alquilar una autocaravana?", 
-            "¿Quién va a conducir la caravana?", 
-            "¿Tu madre ha tenido algún accidente últimamente?", 
-            "Castilla-La Mancha es una zona preciosa. ¿Qué ciudades queréis visitar?", 
-            ["¿Te gusta acampar al aire libre?", "¿Prefieres viajar en verano o en invierno?", "¿Has conducido alguna vez un vehículo grande?"],
-            "Role Play completado."
-        ],
-        4: [
-            "¡Hola! Pareces muy contento/a. ¿Por qué?", 
-            "Es una noticia fantástica. ¿Sabes cuándo entrará en vigor la prohibición del Parlamento Europeo?", 
-            "Es verdad. ¿Qué materiales crees que se deberían usar ahora?", 
-            "En casa intentamos reciclar siempre. ¿Y tú?", 
-            ["¿Crees que tu colegio recicla lo suficiente?", "¿Qué opinas del cambio climático?", "¿Usas botellas de cristal o de plástico?"],
-            "¡Muy bien! Hemos terminado."
-        ],
-        5: [
-            "¡Hola, buenas tardes!", 
-            "Debes estar entre Medina del Campo y Tordesillas, cerca de la salida ciento cincuenta y seis. ¿Ves alguna señal de tráfico por ahí?", 
-            "Claro que sí. Voy a ayudarte inmediatamente. ¿Me puedes describir tu coche?", 
-            "¿Llevas mucho tiempo esperando?", 
-            ["¿Has llamado ya a tu familia para avisar?", "¿Sabes cambiar una rueda tú solo?", "¿Es la primera vez que visitas esta zona?"],
-            "El mecánico llegará pronto. ¡Suerte!"
-        ]
+        1: ["¡Hola, dígame!", "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.", ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"], "Hemos terminado, gracias."],
+        2: ["Buenos días. ¿En qué puedo ayudarte?", "Veo que tienes un problema con el portátil. ¿Qué le ha pasado exactamente a la pantalla?", "¡Qué mala suerte! Y mañana es un día importante. ¿Tienes una copia de seguridad de tus archivos?", "Mira, tengo una oferta: te lo puedo arreglar hoy mismo por trescientos euros. ¿Qué te parece?", ["¿Usas mucho el portátil para tus estudios?", "¿Prefieres Mac o Windows?", "¿Has tenido problemas técnicos antes?"], "Examen finalizado. ¡Buen trabajo!"],
+        3: ["Hola, buenos días. ¿Quieres alquilar una autocaravana?", "¿Quién va a conducir la caravana?", "¿Tu madre ha tenido algún accidente últimamente?", "Castilla-La Mancha es una zona preciosa. ¿Qué ciudades queréis visitar?", ["¿Te gusta acampar al aire libre?", "¿Prefieres viajar en verano o en invierno?", "¿Has conducido alguna vez un vehículo grande?"], "Role Play completado."],
+        4: ["¡Hola! Pareces muy contento/a. ¿Por qué?", "Es una noticia fantástica. ¿Sabes cuándo entrará en vigor la prohibición del Parlamento Europeo?", "Es verdad. ¿Qué materiales crees que se deberían usar ahora?", "En casa intentamos reciclar siempre. ¿Y tú?", ["¿Crees que tu colegio recicla lo suficiente?", "¿Qué opinas del cambio climático?", "¿Usas botellas de cristal o de plástico?"], "¡Muy bien! Hemos terminado."],
+        5: ["¡Hola, buenas tardes!", "Debes estar entre Medina del Campo y Tordesillas, cerca de la salida ciento cincuenta y seis. ¿Ves alguna señal de tráfico por ahí?", "Claro que sí. Voy a ayudarte inmediatamente. ¿Me puedes describir tu coche?", "¿Llevas mucho tiempo esperando?", ["¿Has llamado ya a tu familia para avisar?", "¿Sabes cambiar una rueda tú solo?", "¿Es la primera vez que visitas esta zona?"], "El mecánico llegará pronto. ¡Suerte!"]
     };
 
     function playAudio(archivo, textoFallback) {
         let audio = new Audio(archivo);
         audio.play().catch(e => {
-            console.log("Audio no encontrado, usando robot.");
+            console.log("Audio falló, usando robot.");
             speak(textoFallback);
         });
     }
@@ -117,14 +83,13 @@
         let t = data[current][step];
         let audioFile = "";
 
-        // Lógica de aleatoriedad para preguntas sorpresa (Paso 4 en el índice 0)
         if (step === 4) {
             let opciones = ['a', 'b', 'c'];
             let rand = Math.floor(Math.random() * 3);
             t = data[current][step][rand];
             audioFile = `rp${current}_5${opciones[rand]}.m4a`;
         } else if (step === 5) {
-            audioFile = `rp${current}_6.m4a`; // El cierre
+            audioFile = `rp${current}_6.m4a`;
         } else {
             audioFile = `rp${current}_${step + 1}.m4a`;
         }
@@ -132,8 +97,6 @@
         let c = document.getElementById('chat');
         c.innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
         
-        // Solo intenta audio si es RP1 (que es el que usted tiene grabado)
-        // Para los demás, usará el robot hasta que suba los audios
         if (current === 1) {
             playAudio(audioFile, t);
         } else {
@@ -145,14 +108,20 @@
     }
 
     function send() {
+        // Desbloquear audio en iOS/iPadOS
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
         let i = document.getElementById('box');
         if (!i.value) return;
         document.getElementById('chat').innerHTML += `<div class="bubble st">${i.value}</div>`;
         i.value = "";
-        setTimeout(next, 1200);
+        
+        // Pausa breve para simular que el examinador escucha
+        setTimeout(next, 800);
     }
 
     function runMic() {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
         let Reco = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!Reco) return alert("Micro no disponible");
         let r = new Reco(); r.lang = 'es-ES';
