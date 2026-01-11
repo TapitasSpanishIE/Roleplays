@@ -7,34 +7,29 @@
     <style>
         :root { --primary: #2c3e50; --secondary: #e74c3c; --accent: #3498db; --light-bg: #ecf0f1; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--light-bg); color: #333; }
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; font-size: 1.1em; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; font-size: 1.1em; font-weight: bold; }
         .disclaimer { font-size: 0.75em; font-weight: normal; display: block; margin-top: 4px; color: #bdc3c7; }
-        
         .selector { display: flex; overflow-x: auto; gap: 10px; padding: 12px; background: #fff; border-bottom: 1px solid #ddd; flex-shrink: 0; }
-        .rp-btn { min-width: 110px; padding: 10px; background: #fff; border: 2px solid #ddd; border-radius: 8px; font-size: 13px; cursor: pointer; transition: 0.3s; text-align: center; }
+        .rp-btn { min-width: 110px; padding: 10px; background: #fff; border: 2px solid #ddd; border-radius: 8px; font-size: 13px; cursor: pointer; text-align: center; }
         .active { border-color: var(--secondary); background: #fdf2f2; font-weight: bold; color: var(--secondary); }
-
-        #candidate-card { background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; margin: 10px; border-radius: 4px; font-size: 0.95em; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: none; }
-        .card-context { font-style: italic; color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 8px; line-height: 1.4; }
-        .current-prompt { font-weight: bold; color: #2c3e50; background: #fdf9c4; padding: 5px; border-radius: 3px; }
-
+        #candidate-card { background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; margin: 10px; border-radius: 4px; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .card-context { font-style: italic; color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 8px; font-size: 0.9em; line-height: 1.4; }
+        .current-prompt { font-weight: bold; color: #2c3e50; background: #fdf9c4; padding: 5px; border-radius: 3px; font-size: 0.95em; }
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 16px; line-height: 1.4; }
         .ex { align-self: flex-start; background: white; border: 1px solid #dee2e6; border-bottom-left-radius: 2px; }
-        .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        
+        .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; }
         #next-trigger { display: none; margin: 10px auto; padding: 14px 24px; background: var(--secondary); color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; width: 85%; font-size: 16px; box-shadow: 0 4px 12px rgba(231,76,60,0.3); }
-
         .input-area { background: white; padding: 15px 15px 35px 15px; display: flex; gap: 10px; border-top: 1px solid #ddd; }
         input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #ccc; font-size: 16px; outline: none; }
-        .btn-send { background: var(--accent); color: white; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-send { background: var(--accent); color: white; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; }
         .btn-send:disabled { background: #bdc3c7; }
     </style>
 </head>
 <body>
 
 <header>
-    Practice for SEC Ireland Oral Exam
+    SEC Spanish Oral Practice
     <span class="disclaimer">Based on official Leaving Certificate Role Plays</span>
 </header>
 
@@ -56,7 +51,7 @@
 <button id="next-trigger" onclick="proximaIntervencion()">Tap to hear Examiner ⏩</button>
 
 <div class="input-area">
-    <input type="text" id="userInput" placeholder="Select a scenario to start..." disabled>
+    <input type="text" id="userInput" placeholder="Select a scenario..." disabled>
     <button class="btn-send" id="sendBtn" onclick="enviarRespuesta()" disabled>▶️</button>
 </div>
 
@@ -68,62 +63,27 @@
     const database = {
         1: {
             context: "Vas de ERASMUS a la Universidad de Extremadura en Cáceres. Necesitas alojamiento y llamas por teléfono a la universidad.<br><i>You are going on Erasmus to Caceres and need accommodation advice.</i>",
-            prompts: [
-                "Say you will be on ERASMUS next year. Say you don't know anybody in Caceres and ask for advice about accommodation.",
-                "Say you would prefer to live near the university because last year you lived in the outskirts of Dublin and really didn't like it.",
-                "Say you spent too much time travelling. Say if you could spend that time studying you would get good grades.",
-                "Say the climate is better than in Ireland, so you will consider all areas even if you prefer the city centre.",
-                "Respond to the examiner's question.",
-                "Examen finalizado."
-            ],
+            prompts: ["Say you will be on ERASMUS next year. Say you don't know anybody in Caceres and ask for advice about accommodation.", "Say you would prefer to live near the university because last year you lived in the outskirts of Dublin and really didn't like it.", "Say you spent too much time travelling. Say that if you could spend that time studying you would get good grades.", "Say that's not far and the climate is much better than in Ireland so you will consider all areas even though you would prefer the city centre.", "Respond to the examiner's question.", "Examen finalizado."],
             dialogs: ["¡Hola, dígame!", "¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es muy pequeña y se puede andar a todas partes.", ["¿Has estado alguna vez en Cáceres?", "¿Te gusta vivir en España?"], "Hemos terminado, gracias."]
         },
         2: {
             context: "Estás en Ávila y se te ha roto el portátil. Lo llevas a arreglar.<br><i>Your laptop is broken and you take it to a repair shop in Avila.</i>",
-            prompts: [
-                "Say your laptop fell and the screen is broken. You have an essay due tomorrow and the only copy is there.",
-                "Say you were late for the bus, you slipped and the laptop fell on the ground.",
-                "Say it's good it can be fixed but you saw the same model for sale in the window for 300 euro.",
-                "Say you will buy it if they copy your files to the new drive and give you a free bag.",
-                "Respond to the examiner's question.",
-                "Examen finalizado."
-            ],
+            prompts: ["Say your laptop fell and the screen is broken. You have an essay due tomorrow and the only copy is there.", "Say you were late for the bus, you slipped and the laptop fell on the ground.", "Say it's good it can be fixed but you saw the same model for sale in the window for 300 euro.", "Say you will buy it if they copy your files to the new drive and give you a free bag.", "Respond to the examiner's question.", "Examen finalizado."],
             dialogs: ["¡Hola! ¿En qué puedo ayudarte?", "Vamos a ver. ¿Qué le pasó?", "Necesitas una nueva pantalla. Cuesta 200 euros.", "Hay una oferta especial esta semana. ¿Quieres comprarlo?", ["¿Prefieres Mac o Windows?", "¿Usas mucho el ordenador?"], "Examen finalizado."]
         },
         3: {
             context: "Vas a España de vacaciones y tu familia quiere alquilar una autocaravana.<br><i>You are going to Spain and your family wants to hire a camper van.</i>",
-            prompts: [
-                "Say you are a student from Ireland interested in hiring a camper van for two weeks in July.",
-                "Say your mother will be driving because you don't have your licence yet. You are getting lessons.",
-                "Say she has driven on the right in Europe for 20 years and is a very careful driver.",
-                "Say you hope to travel through Castilla-La Mancha to see the land of Cervantes, far from tourists.",
-                "Respond to the examiner's question.",
-                "Examen finalizado."
-            ],
+            prompts: ["Say you are a student from Ireland interested in hiring a camper van for two weeks in July.", "Say your mother will be driving because you don't have your licence yet. You are getting lessons.", "Say she has driven on the right in Europe for 20 years and is a very careful driver.", "Say you hope to travel through Castilla-La Mancha to see the land of Cervantes, far from tourists.", "Respond to the examiner's question.", "Examen finalizado."],
             dialogs: ["¡Hola! ¿En qué puedo ayudarte?", "Para alquilar hace falta tener al menos 25 años y experiencia.", "Muy bien. Tu madre cumple los requisitos.", "¡Fenomenal! ¿Tenéis el itinerario previsto?", ["¿Te gusta acampar?", "¿Prefieres el mar o la montaña?"], "Role Play completado."]
         },
         4: {
             context: "Estás preocupado por la contaminación de plásticos y has oído buenas noticias.<br><i>You are worried about plastic pollution and heard good news.</i>",
-            prompts: [
-                "The European Parliament has agreed to ban single use plastics (knives, forks, straws...).",
-                "Say it's essential and will be good for the waters. Plastic is a serious problem in rivers and oceans.",
-                "Say there are lots of things we can do, like using recycled paper or biodegradable materials.",
-                "Say no, citizens need to be more responsible. We could cycle, use public transport or walk more.",
-                "Respond to the examiner's question.",
-                "Examen finalizado."
-            ],
+            prompts: ["The European Parliament has agreed to ban single use plastics (knives, forks, straws...).", "Say it's essential and will be good for the waters. Plastic is a serious problem in rivers and oceans.", "Say there are lots of things we can do, like using recycled paper or biodegradable materials.", "Say no, citizens need to be more responsible. We could cycle, use public transport or walk more.", "Respond to the examiner's question.", "Examen finalizado."],
             dialogs: ["Pareces muy contento, ¿por qué?", "¿Es importante prohibir plásticos de usar y tirar?", "¿Podemos hacer algo más?", "¿Y ya está?", ["¿Tu colegio recicla?", "¿Qué opinas del cambio climático?"], "¡Muy bien!"]
         },
         5: {
             context: "Tu coche se ha parado en la autopista AP-6 y llamas a tu seguro.<br><i>Your car has broken down on the AP-6 motorway and you ring your insurance company.</i>",
-            prompts: [
-                "Say your car has broken down on the AP-6. Say you passed the toll half an hour ago.",
-                "Say you see the exit sign 156. Ask for a mechanic or tow truck because the problem is serious.",
-                "Ask for a replacement car to continue to Lugo. You have to collect your parents from the airport.",
-                "Say it's a red SEAT Ibiza (4620 CFK). You bought it second hand from your aunt.",
-                "Respond to the examiner's question.",
-                "Examen finalizado."
-            ],
+            prompts: ["Say your car has just broken down and that you are on the AP-6 motorway.", "Say you passed through the toll half an hour ago. You see the exit sign 156 in the distance.", "Ask if they can send out a mechanic or a tow truck because the problem is serious.", "Ask for a replacement car. Say it's a red SEAT Ibiza (4620 CFK) bought second hand from your aunt.", "Respond to the examiner's question.", "Examen finalizado."],
             dialogs: ["Hola, buenas tardes.", "¿Hay alguna señal de tráfico por ahí?", "Voy a arreglarlo todo inmediatamente.", "¿Me puedes describir tu coche?", ["¿Sabes cambiar una rueda?", "¿Llevas mucho esperando?"], "El mecánico llegará pronto."]
         }
     };
@@ -133,24 +93,17 @@
         const btn = document.getElementById('sendBtn');
         input.disabled = !enabled;
         btn.disabled = !enabled;
-        if (enabled) {
-            input.placeholder = "Write your answer in Spanish...";
-            setTimeout(() => input.focus(), 50);
-        } else {
-            input.placeholder = speaking ? "Examiner speaking..." : "Waiting...";
-        }
+        input.placeholder = enabled ? "Write in Spanish..." : (speaking ? "Listening..." : "Waiting...");
     }
 
     function seleccionarRP(id) {
-        rpActual = id;
-        pasoActual = 0;
-        speaking = false;
+        rpActual = id; pasoActual = 0; speaking = false;
         window.speechSynthesis.cancel();
         document.querySelectorAll('.rp-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('b' + id).classList.add('active');
         document.getElementById('candidate-card').style.display = "block";
         document.getElementById('card-context').innerHTML = database[id].context;
-        document.getElementById('current-prompt').innerHTML = "Click the red button to start.";
+        document.getElementById('current-prompt').innerHTML = "Click the RED BUTTON to start.";
         document.getElementById('chat').innerHTML = "";
         document.getElementById('next-trigger').style.display = "block";
         setInputEnabled(false);
@@ -161,52 +114,58 @@
         const input = document.getElementById('userInput');
         const texto = input.value.trim();
         if (!texto) return;
+
+        // SACUDIDA PARA IPAD: Despierta el motor de audio al hacer clic
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance("")); 
+
         document.getElementById('chat').innerHTML += `<div class="bubble st">${texto}</div>`;
         input.value = "";
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+        
         setInputEnabled(false);
-        if (pasoActual < database[rpActual].dialogs.length) {
+        setTimeout(() => {
             document.getElementById('next-trigger').style.display = "block";
-        }
+        }, 500);
     }
 
     function proximaIntervencion() {
         if (!rpActual || speaking) return;
         document.getElementById('next-trigger').style.display = "none";
-        let t = database[rpActual].dialogs[pasoActual];
-        let nombreAudio = "";
-        if (pasoActual === 4) {
-            let letras = ['a', 'b', 'c'];
-            let r = Math.floor(Math.random() * 3);
-            t = database[rpActual].dialogs[4][r];
-            nombreAudio = `rp${rpActual}_5${letras[r]}.mp3`;
-        } else if (pasoActual === 5) {
-            nombreAudio = `rp${rpActual}_6.mp3`;
-        } else {
-            nombreAudio = `rp${rpActual}_${pasoActual + 1}.mp3`;
-        }
-        document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
-        document.getElementById('current-prompt').innerHTML = `<b>Current Prompt:</b> ${database[rpActual].prompts[pasoActual]}`;
-        document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
         speaking = true;
+
+        let t = database[rpActual].dialogs[pasoActual];
+        if (Array.isArray(t)) t = t[Math.floor(Math.random() * t.length)];
+
         const finalizarTurno = () => {
             speaking = false;
             pasoActual++;
-            if (pasoActual < database[rpActual].dialogs.length) { setInputEnabled(true); }
+            if (pasoActual < database[rpActual].dialogs.length) {
+                setInputEnabled(true);
+            }
         };
-        if (rpActual === 1) {
-            const audio = new Audio(nombreAudio);
+
+        // Mostrar texto y prompt ANTES de intentar el audio
+        document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
+        document.getElementById('current-prompt').innerHTML = `<b>Prompt:</b> ${database[rpActual].prompts[pasoActual]}`;
+        document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+
+        // Intentar reproducir MP3
+        let audioPath = `rp${rpActual}_${pasoActual + 1}.mp3`;
+        const audio = new Audio(audioPath);
+        
+        audio.play().then(() => {
             audio.onended = finalizarTurno;
-            audio.onerror = () => hablarRobot(t, finalizarTurno);
-            audio.play().catch(() => hablarRobot(t, finalizarTurno));
-        } else { hablarRobot(t, finalizarTurno); }
+        }).catch(() => {
+            // Si el MP3 falla o no existe, salta al robot
+            hablarRobot(t, finalizarTurno);
+        });
     }
 
     function hablarRobot(texto, onEndCb) {
         window.speechSynthesis.cancel();
         const m = new SpeechSynthesisUtterance(texto);
         m.lang = 'es-ES'; m.rate = 0.85;
-        m.onend = () => { if (onEndCb) onEndCb(); };
+        m.onend = onEndCb;
         window.speechSynthesis.speak(m);
     }
 </script>
