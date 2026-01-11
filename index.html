@@ -7,24 +7,18 @@
     <style>
         :root { --primary: #1a237e; --secondary: #c62828; }
         body { font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #e5ddd5; }
-        header { background: var(--primary); color: white; padding: 10px; text-align: center; flex-shrink: 0; font-weight: bold; }
+        header { background: var(--primary); color: white; padding: 10px; text-align: center; font-weight: bold; }
         .selector { display: flex; overflow-x: auto; gap: 8px; padding: 10px; background: #fff; border-bottom: 2px solid #ccc; flex-shrink: 0; }
-        .rp-btn { min-width: 90px; padding: 10px; background: #f8f8f8; border: 1px solid #999; border-radius: 8px; font-size: 13px; text-align: center; cursor: pointer; }
+        .rp-btn { min-width: 90px; padding: 10px; background: #f8f8f8; border: 1px solid #999; border-radius: 8px; font-size: 12px; cursor: pointer; border: 1px solid #ccc; }
         .active { background: var(--secondary) !important; color: white; }
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .bubble { max-width: 80%; padding: 12px; border-radius: 12px; font-size: 16px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .ex { align-self: flex-start; background: white; border-bottom-left-radius: 2px; }
-        .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; }
-        
-        #next-trigger { 
-            display: none; margin: 10px auto; padding: 15px 30px; background: var(--secondary); 
-            color: white; border: none; border-radius: 30px; font-weight: bold; font-size: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; flex-shrink: 0;
-        }
-
-        .input-area { background: white; padding: 15px 15px 40px 15px; display: flex; gap: 10px; border-top: 2px solid var(--primary); }
-        input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 17px; }
-        .btn { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 50%; font-size: 20px; cursor: pointer; }
+        .bubble { max-width: 80%; padding: 12px; border-radius: 12px; font-size: 16px; line-height: 1.4; }
+        .ex { align-self: flex-start; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .st { align-self: flex-end; background: #dcf8c6; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        #next-trigger { display: none; margin: 10px auto; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; width: 80%; }
+        .input-area { background: white; padding: 10px 10px 30px 10px; display: flex; gap: 10px; border-top: 1px solid #ccc; }
+        input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 16px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 50%; font-size: 20px; }
     </style>
 </head>
 <body>
@@ -32,130 +26,108 @@
 <header>Señor Martín: Simulador Oficial SEC</header>
 
 <div class="selector">
-    <div class="rp-btn" id="b1" onclick="start(1)">🏠 1. Cáceres</div>
-    <div class="rp-btn" id="b2" onclick="start(2)">💻 2. Ávila</div>
-    <div class="rp-btn" id="b3" onclick="start(3)">🚐 3. Caravana</div>
-    <div class="rp-btn" id="b4" onclick="start(4)">♻️ 4. Plásticos</div>
-    <div class="rp-btn" id="b5" onclick="start(5)">🚗 5. Avería</div>
+    <div class="rp-btn" id="b1" onclick="iniciarExamen(1)">🏠 1. Cáceres</div>
+    <div class="rp-btn" id="b2" onclick="iniciarExamen(2)">💻 2. Ávila</div>
+    <div class="rp-btn" id="b3" onclick="iniciarExamen(3)">🚐 3. Caravana</div>
+    <div class="rp-btn" id="b4" onclick="iniciarExamen(4)">♻️ 4. Plásticos</div>
+    <div class="rp-btn" id="b5" onclick="iniciarExamen(5)">🚗 5. Avería</div>
 </div>
 
 <div id="chat"></div>
 
-<button id="next-trigger" onclick="avanzarManual()">Escuchar examinador ⏩</button>
+<button id="next-trigger" onclick="proximaIntervencion()">Pulsar para escuchar al examinador ⏩</button>
 
 <div class="input-area">
-    <button class="btn" id="mic" onclick="runMic()">🎙️</button>
-    <input type="text" id="box" placeholder="Tu respuesta aparecerá aquí...">
-    <button class="btn" onclick="send()">▶️</button>
+    <button class="btn" id="micBtn" onclick="activarMicro()">🎙️</button>
+    <input type="text" id="userInput" placeholder="Escribe o usa el micro...">
+    <button class="btn" onclick="enviarRespuesta()">▶️</button>
 </div>
 
 <script>
-    let current = null; 
-    let step = 0;
-    let recognition;
+    let rpActual = null;
+    let pasoActual = 0;
+    let reconocimiento;
 
-    const data = {
+    const contenido = {
         1: ["¡Hola, dígame!", "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.", ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"], "Hemos terminado, gracias."],
-        2: ["Buenos días. ¿En qué puedo ayudarte?", "Veo que tienes un problema con el portátil. ¿Qué le ha pasado exactamente a la pantalla?", "¡Qué mala suerte! ¿Tienes copia de seguridad?", "Tengo una oferta: te lo arreglo hoy por 300€. ¿Qué te parece?", ["¿Usas mucho el portátil?", "¿Prefieres Mac o Windows?", "¿Has tenido problemas antes?"], "Examen finalizado."],
-        3: ["Hola, buenos días. ¿Quieres alquilar una autocaravana?", "¿Quién va a conducir?", "¿Tu madre ha tenido algún accidente?", "Castilla-La Mancha es preciosa. ¿Qué ciudades queréis visitar?", ["¿Te gusta acampar?", "¿Prefieres verano o invierno?", "¿Has conducido algo grande?"], "Role Play completado."],
-        4: ["¡Hola! Pareces muy contento/a. ¿Por qué?", "¿Sabes cuándo entrará en vigor la prohibición del Parlamento Europeo?", "¿Qué materiales crees que se deberían usar?", "En casa reciclamos siempre. ¿Y tú?", ["¿Tu colegio recicla?", "¿Qué opinas del cambio climático?", "¿Usas botellas de cristal?"], "¡Muy bien!"],
-        5: ["¡Hola, buenas tardes!", "Debes estar entre Medina y Tordesillas, cerca de la salida 156. ¿Ves alguna señal?", "¿Me puedes describir tu coche?", "¿Llevas mucho tiempo esperando?", ["¿Has llamado a tu familia?", "¿Sabes cambiar una rueda?", "¿Conoces esta zona?"], "El mecánico llegará pronto."]
+        2: ["Buenos días. ¿En qué puedo ayudarte?", "¿Qué le ha pasado exactamente a la pantalla?", "¿Tienes copia de seguridad?", "Te lo arreglo hoy por 300€. ¿Qué te parece?", ["¿Usas mucho el PC?", "¿Prefieres Mac o Windows?", "¿Has tenido problemas antes?"], "Examen finalizado."],
+        3: ["Hola. ¿Quieres alquilar una autocaravana?", "¿Quién va a conducir?", "¿Tu madre ha tenido algún accidente?", "¿Qué ciudades queréis visitar?", ["¿Te gusta acampar?", "¿Prefieres verano o invierno?", "¿Has conducido algo grande?"], "Role Play completado."],
+        4: ["¡Hola! ¿Por qué estás tan contento?", "¿Cuándo entra en vigor la prohibición europea?", "¿Qué materiales usarías?", "Nosotros reciclamos siempre. ¿Y tú?", ["¿Tu colegio recicla?", "¿Qué opinas del cambio climático?", "¿Usas cristal?"], "¡Muy bien!"],
+        5: ["¡Hola, buenas tardes!", "¿Ves alguna señal de tráfico por la salida 156?", "¿Me puedes describir tu coche?", "¿Llevas mucho tiempo esperando?", ["¿Has llamado a tu familia?", "¿Sabes cambiar una rueda?", "¿Conoces esta zona?"], "El mecánico llegará pronto."]
     };
 
-    function playAudio(archivo, fallbackTxt) {
-        let audio = new Audio(archivo);
-        audio.play().catch(() => speak(fallbackTxt));
-    }
-
-    function speak(txt) {
-        window.speechSynthesis.cancel();
-        let m = new SpeechSynthesisUtterance(txt);
-        m.lang = 'es-ES'; m.rate = 0.85;
-        window.speechSynthesis.speak(m);
-    }
-
-    function start(id) {
-        current = id; step = 0;
+    function iniciarExamen(id) {
+        rpActual = id; pasoActual = 0;
         document.querySelectorAll('.rp-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('b'+id).classList.add('active');
         document.getElementById('chat').innerHTML = "";
         document.getElementById('next-trigger').style.display = "none";
-        next();
+        proximaIntervencion();
     }
 
-    function avanzarManual() {
-        document.getElementById('next-trigger').style.display = "none";
-        next();
-    }
-
-    function next() {
-        if (!current || step >= data[current].length) return;
-        let t = data[current][step];
-        let audioFile = "";
-
-        if (step === 4) {
-            let ops = ['a', 'b', 'c']; let r = Math.floor(Math.random() * 3);
-            t = data[current][4][r];
-            audioFile = `rp${current}_5${ops[r]}.m4a`;
-        } else if (step === 5) {
-            audioFile = `rp${current}_6.m4a`;
-        } else {
-            audioFile = `rp${current}_${step + 1}.m4a`;
-        }
-
-        document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
-        if (current === 1) playAudio(audioFile, t);
-        else speak(t);
+    function enviarRespuesta() {
+        let input = document.getElementById('userInput');
+        if (!input.value) return;
         
-        let chatDiv = document.getElementById('chat');
-        chatDiv.scrollTop = chatDiv.scrollHeight;
-        step++;
-    }
+        let chat = document.getElementById('chat');
+        chat.innerHTML += `<div class="bubble st">${input.value}</div>`;
+        input.value = "";
+        chat.scrollTop = chat.scrollHeight;
 
-    function send() {
-        // Si el micrófono está encendido, lo apagamos a la fuerza
-        if (recognition) {
-            recognition.stop();
-            document.getElementById('mic').style.background = '#1a237e';
-        }
-
-        let i = document.getElementById('box');
-        if (!i.value) return;
-        document.getElementById('chat').innerHTML += `<div class="bubble st">${i.value}</div>`;
-        i.value = "";
-        
-        if (step < data[current].length) {
+        if (pasoActual < contenido[rpActual].length) {
             document.getElementById('next-trigger').style.display = "block";
         }
     }
 
-    function runMic() {
+    function proximaIntervencion() {
+        document.getElementById('next-trigger').style.display = "none";
+        let t = contenido[rpActual][pasoActual];
+        let nombreAudio = "";
+
+        // Lógica de aleatoriedad
+        if (pasoActual === 4) {
+            let letras = ['a', 'b', 'c'];
+            let r = Math.floor(Math.random() * 3);
+            t = contenido[rpActual][4][r];
+            nombreAudio = `rp${rpActual}_5${letras[r]}.mp3`;
+        } else if (pasoActual === 5) {
+            nombreAudio = `rp${rpActual}_6.mp3`;
+        } else {
+            nombreAudio = `rp${rpActual}_${pasoActual + 1}.mp3`;
+        }
+
+        document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
+        document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+
+        // Intentar audio MP3 si es RP1, si no, robot
+        if (rpActual === 1) {
+            let audio = new Audio(nombreAudio);
+            audio.play().catch(() => hablarRobot(t));
+        } else {
+            hablarRobot(t);
+        }
+        pasoActual++;
+    }
+
+    function hablarRobot(texto) {
+        window.speechSynthesis.cancel();
+        let m = new SpeechSynthesisUtterance(texto);
+        m.lang = 'es-ES'; m.rate = 0.9;
+        window.speechSynthesis.speak(m);
+    }
+
+    function activarMicro() {
         let Reco = window.webkitSpeechRecognition || window.SpeechRecognition;
-        if (!Reco) return alert("Micro no soportado");
+        if (!Reco) return alert("Navegador no compatible");
         
-        recognition = new Reco();
-        recognition.lang = 'es-ES';
-        recognition.continuous = false;
-        recognition.interimResults = true;
-
-        recognition.onstart = () => {
-            document.getElementById('mic').style.background = 'red';
-            document.getElementById('box').value = ""; 
+        reconocimiento = new Reco();
+        reconocimiento.lang = 'es-ES';
+        reconocimiento.onstart = () => document.getElementById('micBtn').style.background = 'red';
+        reconocimiento.onresult = (e) => {
+            document.getElementById('userInput').value = e.results[0][0].transcript;
         };
-
-        recognition.onresult = (e) => {
-            let text = "";
-            for (let i = e.resultIndex; i < e.results.length; ++i) {
-                text += e.results[i][0].transcript;
-            }
-            document.getElementById('box').value = text;
-        };
-
-        recognition.onend = () => {
-            document.getElementById('mic').style.background = '#1a237e';
-        };
-
-        recognition.start();
+        reconocimiento.onend = () => document.getElementById('micBtn').style.background = '#1a237e';
+        reconocimiento.start();
     }
 </script>
 </body>
