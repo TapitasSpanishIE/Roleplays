@@ -18,7 +18,9 @@
         #next-trigger { display: none; margin: 15px auto; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; width: 85%; text-align: center; font-size: 16px; box-shadow: 0 4px 10px rgba(198,40,40,0.3); }
         .input-area { background: white; padding: 15px 15px 40px 15px; display: flex; gap: 12px; border-top: 1px solid #eee; }
         input { flex: 1; padding: 14px 20px; border-radius: 25px; border: 1px solid #ddd; font-size: 16px; outline: none; }
+        input:disabled { background: #f0f0f0; }
         .btn-send { background: var(--primary); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 22px; cursor: pointer; flex-shrink: 0; }
+        .btn-send:disabled { background: #ccc; }
     </style>
 </head>
 <body>
@@ -35,16 +37,18 @@
 
 <div id="chat"></div>
 
-<button id="next-trigger" onclick="proximaIntervencion()">Pulsar para escuchar al examinador ⏩</button>
+<button id="next-trigger" onclick="proximaIntervencion()">Escuchar examinador ⏩</button>
 
 <div class="input-area">
-    <input type="text" id="userInput" placeholder="Escribe o dicta aquí..." autocomplete="off">
-    <button class="btn-send" onclick="enviarRespuesta()">▶️</button>
+    <input type="text" id="userInput" placeholder="Selecciona un escenario..." autocomplete="off" disabled>
+    <button class="btn-send" onclick="enviarRespuesta()" disabled>▶️</button>
 </div>
 
 <script>
     let rpActual = null;
     let pasoActual = 0;
+    let esperandoRespuesta = false;
+    let speaking = false;
 
     const contenido = {
         1: ["¡Hola, dígame!", "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.", ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"], "Hemos terminado, gracias."],
@@ -54,29 +58,62 @@
         5: ["¡Hola, buenas tardes!", "¿Ves alguna señal de tráfico por la salida 156?", "¿Me puedes describir tu coche?", "¿Llevas mucho tiempo esperando?", ["¿Has llamado a tu familia?", "¿Sabes cambiar una rueda?", "¿Conoces esta zona?"], "El mecánico llegará pronto."]
     };
 
-    // NUEVO: El botón de arriba solo selecciona, no dispara audio directo para evitar bloqueos
+    function setInputEnabled(enabled) {
+        const input = document.getElementById('userInput');
+        const btn = document.querySelector('.btn-send');
+        input.disabled = !enabled;
+        btn.disabled = !enabled;
+        if (enabled) {
+            input.placeholder = "Escribe o dicta aquí...";
+            setTimeout(() => input.focus(), 50);
+        } else {
+            input.placeholder = speaking ? "El examinador está hablando..." : "Esperando...";
+        }
+    }
+
     function seleccionarRP(id) {
-        rpActual = id; pasoActual = 0;
+        rpActual = id;
+        pasoActual = 0;
+        esperandoRespuesta = false;
+        speaking = false;
+        window.speechSynthesis.cancel();
+
         document.querySelectorAll('.rp-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('b'+id).classList.add('active');
-        document.getElementById('chat').innerHTML = '<div class="bubble ex">Has seleccionado el escenario. Pulsa el botón rojo para empezar.</div>';
+        document.getElementById('b' + id).classList.add('active');
+
+        document.getElementById('chat').innerHTML = '<div class="bubble ex">Escenario seleccionado. Pulsa el botón rojo para empezar el examen.</div>';
         document.getElementById('next-trigger').style.display = "block";
+        setInputEnabled(false);
     }
 
     function enviarRespuesta() {
-        let input = document.getElementById('userInput');
-        if (!input.value) return;
-        
-        document.getElementById('chat').innerHTML += `<div class="bubble st">${input.value}</div>`;
+        if (!rpActual || speaking || !esperandoRespuesta) return;
+
+        const input = document.getElementById('userInput');
+        const texto = input.value.trim();
+        if (!texto) return;
+
+        document.getElementById('chat').innerHTML += `<div class="bubble st">${texto}</div>`;
         input.value = "";
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
+        esperandoRespuesta = false;
+        setInputEnabled(false);
+
+        // Tras responder, SIEMPRE mostramos el botón rojo para asegurar el audio en iPad
         if (pasoActual < contenido[rpActual].length) {
             document.getElementById('next-trigger').style.display = "block";
         }
     }
 
+    // Permitir enviar con Enter
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') enviarRespuesta();
+    });
+
     function proximaIntervencion() {
+        if (!rpActual || speaking) return;
+
         document.getElementById('next-trigger').style.display = "none";
         let t = contenido[rpActual][pasoActual];
         let nombreAudio = "";
@@ -95,19 +132,34 @@
         document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
+        speaking = true;
+        setInputEnabled(false);
+
+        const finalizarTurno = () => {
+            speaking = false;
+            pasoActual++;
+            if (pasoActual < contenido[rpActual].length) {
+                esperandoRespuesta = true;
+                setInputEnabled(true);
+            }
+        };
+
         if (rpActual === 1) {
-            let audio = new Audio(nombreAudio);
-            audio.play().catch(() => hablarRobot(t));
+            const audio = new Audio(nombreAudio);
+            audio.onended = finalizarTurno;
+            audio.onerror = () => hablarRobot(t, finalizarTurno);
+            audio.play().catch(() => hablarRobot(t, finalizarTurno));
         } else {
-            hablarRobot(t);
+            hablarRobot(t, finalizarTurno);
         }
-        pasoActual++;
     }
 
-    function hablarRobot(texto) {
+    function hablarRobot(texto, onEndCb) {
         window.speechSynthesis.cancel();
-        let m = new SpeechSynthesisUtterance(texto);
-        m.lang = 'es-ES'; m.rate = 0.9;
+        const m = new SpeechSynthesisUtterance(texto);
+        m.lang = 'es-ES';
+        m.rate = 0.9;
+        m.onend = () => { if (onEndCb) onEndCb(); };
         window.speechSynthesis.speak(m);
     }
 </script>
