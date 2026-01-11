@@ -15,7 +15,7 @@
         .bubble { max-width: 80%; padding: 12px; border-radius: 12px; font-size: 16px; line-height: 1.4; }
         .ex { align-self: flex-start; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .st { align-self: flex-end; background: #dcf8c6; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        #next-trigger { display: none; margin: 10px auto; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; width: 80%; }
+        #next-trigger { display: none; margin: 10px auto; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; width: 80%; text-align: center; }
         .input-area { background: white; padding: 10px 10px 30px 10px; display: flex; gap: 10px; border-top: 1px solid #ccc; }
         input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 16px; }
         .btn { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 50%; font-size: 20px; }
@@ -35,7 +35,7 @@
 
 <div id="chat"></div>
 
-<button id="next-trigger" onclick="proximaIntervencion()">Pulsar para escuchar al examinador ⏩</button>
+<button id="next-trigger" onclick="proximaIntervencion()">Escuchar al examinador ⏩</button>
 
 <div class="input-area">
     <button class="btn" id="micBtn" onclick="activarMicro()">🎙️</button>
@@ -46,7 +46,7 @@
 <script>
     let rpActual = null;
     let pasoActual = 0;
-    let reconocimiento;
+    let recognition;
 
     const contenido = {
         1: ["¡Hola, dígame!", "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.", ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"], "Hemos terminado, gracias."],
@@ -69,10 +69,12 @@
         let input = document.getElementById('userInput');
         if (!input.value) return;
         
-        let chat = document.getElementById('chat');
-        chat.innerHTML += `<div class="bubble st">${input.value}</div>`;
+        // Si el micro seguía activo, lo forzamos a parar
+        if (recognition) recognition.stop();
+
+        document.getElementById('chat').innerHTML += `<div class="bubble st">${input.value}</div>`;
         input.value = "";
-        chat.scrollTop = chat.scrollHeight;
+        document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
         if (pasoActual < contenido[rpActual].length) {
             document.getElementById('next-trigger').style.display = "block";
@@ -84,22 +86,20 @@
         let t = contenido[rpActual][pasoActual];
         let nombreAudio = "";
 
-        // Lógica de aleatoriedad
         if (pasoActual === 4) {
             let letras = ['a', 'b', 'c'];
             let r = Math.floor(Math.random() * 3);
             t = contenido[rpActual][4][r];
-            nombreAudio = `rp${rpActual}_5${letras[r]}.mp3`;
+            nombreAudio = `rp${rpActual}_5${letras[r]}.m4a`;
         } else if (pasoActual === 5) {
-            nombreAudio = `rp${rpActual}_6.mp3`;
+            nombreAudio = `rp${rpActual}_6.m4a`;
         } else {
-            nombreAudio = `rp${rpActual}_${pasoActual + 1}.mp3`;
+            nombreAudio = `rp${rpActual}_${pasoActual + 1}.m4a`;
         }
 
         document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
-        // Intentar audio MP3 si es RP1, si no, robot
         if (rpActual === 1) {
             let audio = new Audio(nombreAudio);
             audio.play().catch(() => hablarRobot(t));
@@ -118,16 +118,36 @@
 
     function activarMicro() {
         let Reco = window.webkitSpeechRecognition || window.SpeechRecognition;
-        if (!Reco) return alert("Navegador no compatible");
+        if (!Reco) return alert("Micro no compatible");
         
-        reconocimiento = new Reco();
-        reconocimiento.lang = 'es-ES';
-        reconocimiento.onstart = () => document.getElementById('micBtn').style.background = 'red';
-        reconocimiento.onresult = (e) => {
-            document.getElementById('userInput').value = e.results[0][0].transcript;
+        recognition = new Reco();
+        recognition.lang = 'es-ES';
+        recognition.continuous = false; // Importante para que pare solo
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            document.getElementById('micBtn').style.background = 'red';
+            document.getElementById('userInput').placeholder = "Escuchando...";
         };
-        reconocimiento.onend = () => document.getElementById('micBtn').style.background = '#1a237e';
-        reconocimiento.start();
+
+        recognition.onresult = (e) => {
+            let resultado = e.results[0][0].transcript;
+            document.getElementById('userInput').value = resultado;
+            document.getElementById('micBtn').style.background = '#1a237e';
+            // Una vez transcribe, el usuario solo tiene que darle a PLAY
+        };
+
+        recognition.onerror = (e) => {
+            document.getElementById('micBtn').style.background = '#1a237e';
+            console.error("Error micro:", e.error);
+        };
+
+        recognition.onend = () => {
+            document.getElementById('micBtn').style.background = '#1a237e';
+            document.getElementById('userInput').placeholder = "Escribe o usa el micro...";
+        };
+
+        recognition.start();
     }
 </script>
 </body>
