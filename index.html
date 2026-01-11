@@ -7,17 +7,34 @@
     <style>
         :root { --primary: #1a237e; --secondary: #c62828; }
         body { font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #e5ddd5; }
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; flex-shrink: 0; font-weight: bold; }
+        header { background: var(--primary); color: white; padding: 10px; text-align: center; flex-shrink: 0; font-weight: bold; }
         .selector { display: flex; overflow-x: auto; gap: 8px; padding: 10px; background: #fff; border-bottom: 2px solid #ccc; flex-shrink: 0; }
         .rp-btn { min-width: 90px; padding: 10px; background: #f8f8f8; border: 1px solid #999; border-radius: 8px; font-size: 13px; text-align: center; cursor: pointer; }
         .active { background: var(--secondary) !important; color: white; }
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .bubble { max-width: 80%; padding: 12px; border-radius: 12px; font-size: 16px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .ex { align-self: flex-start; background: white; }
-        .st { align-self: flex-end; background: #dcf8c6; }
+        .ex { align-self: flex-start; background: white; border-bottom-left-radius: 2px; }
+        .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; }
+        
+        /* Botón de Continuar sugerido por el usuario */
+        #next-trigger { 
+            display: none; 
+            margin: 10px auto; 
+            padding: 15px 30px; 
+            background: var(--secondary); 
+            color: white; 
+            border: none; 
+            border-radius: 30px; 
+            font-weight: bold; 
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
         .input-area { background: white; padding: 15px 15px 40px 15px; display: flex; gap: 10px; border-top: 2px solid var(--primary); }
         input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 17px; }
-        .btn { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 50%; font-size: 20px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 50%; font-size: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -34,38 +51,35 @@
 
 <div id="chat"></div>
 
+<button id="next-trigger" onclick="avanzarManual()">Escuchar examinador ⏩</button>
+
 <div class="input-area">
     <button class="btn" id="mic" onclick="runMic()">🎙️</button>
-    <input type="text" id="box" placeholder="Responde al examinador...">
+    <input type="text" id="box" placeholder="Tu respuesta...">
     <button class="btn" onclick="send()">▶️</button>
 </div>
 
 <script>
     let current = null; 
     let step = 0;
-    let audioContext;
 
     const data = {
         1: ["¡Hola, dígame!", "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.", ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"], "Hemos terminado, gracias."],
-        2: ["Buenos días. ¿En qué puedo ayudarte?", "Veo que tienes un problema con el portátil. ¿Qué le ha pasado exactamente a la pantalla?", "¡Qué mala suerte! Y mañana es un día importante. ¿Tienes una copia de seguridad de tus archivos?", "Mira, tengo una oferta: te lo puedo arreglar hoy mismo por trescientos euros. ¿Qué te parece?", ["¿Usas mucho el portátil para tus estudios?", "¿Prefieres Mac o Windows?", "¿Has tenido problemas técnicos antes?"], "Examen finalizado. ¡Buen trabajo!"],
-        3: ["Hola, buenos días. ¿Quieres alquilar una autocaravana?", "¿Quién va a conducir la caravana?", "¿Tu madre ha tenido algún accidente últimamente?", "Castilla-La Mancha es una zona preciosa. ¿Qué ciudades queréis visitar?", ["¿Te gusta acampar al aire libre?", "¿Prefieres viajar en verano o en invierno?", "¿Has conducido alguna vez un vehículo grande?"], "Role Play completado."],
-        4: ["¡Hola! Pareces muy contento/a. ¿Por qué?", "Es una noticia fantástica. ¿Sabes cuándo entrará en vigor la prohibición del Parlamento Europeo?", "Es verdad. ¿Qué materiales crees que se deberían usar ahora?", "En casa intentamos reciclar siempre. ¿Y tú?", ["¿Crees que tu colegio recicla lo suficiente?", "¿Qué opinas del cambio climático?", "¿Usas botellas de cristal o de plástico?"], "¡Muy bien! Hemos terminado."],
-        5: ["¡Hola, buenas tardes!", "Debes estar entre Medina del Campo y Tordesillas, cerca de la salida ciento cincuenta y seis. ¿Ves alguna señal de tráfico por ahí?", "Claro que sí. Voy a ayudarte inmediatamente. ¿Me puedes describir tu coche?", "¿Llevas mucho tiempo esperando?", ["¿Has llamado ya a tu familia para avisar?", "¿Sabes cambiar una rueda tú solo?", "¿Es la primera vez que visitas esta zona?"], "El mecánico llegará pronto. ¡Suerte!"]
+        2: ["Buenos días. ¿En qué puedo ayudarte?", "Veo que tienes un problema con el portátil. ¿Qué le ha pasado exactamente a la pantalla?", "¡Qué mala suerte! ¿Tienes copia de seguridad?", "Tengo una oferta: te lo arreglo hoy por 300€. ¿Qué te parece?", ["¿Usas mucho el portátil?", "¿Prefieres Mac o Windows?", "¿Has tenido problemas antes?"], "Examen finalizado."],
+        3: ["Hola, buenos días. ¿Quieres alquilar una autocaravana?", "¿Quién va a conducir?", "¿Tu madre ha tenido algún accidente?", "Castilla-La Mancha es preciosa. ¿Qué ciudades queréis visitar?", ["¿Te gusta acampar?", "¿Prefieres verano o invierno?", "¿Has conducido algo grande?"], "Role Play completado."],
+        4: ["¡Hola! Pareces muy contento/a. ¿Por qué?", "¿Sabes cuándo entrará en vigor la prohibición del Parlamento Europeo?", "¿Qué materiales crees que se deberían usar?", "En casa reciclamos siempre. ¿Y tú?", ["¿Tu colegio recicla?", "¿Qué opinas del cambio climático?", "¿Usas botellas de cristal?"], "¡Muy bien!"],
+        5: ["¡Hola, buenas tardes!", "Debes estar entre Medina y Tordesillas, cerca de la salida 156. ¿Ves alguna señal?", "¿Me puedes describir tu coche?", "¿Llevas mucho tiempo esperando?", ["¿Has llamado a tu familia?", "¿Sabes cambiar una rueda?", "¿Conoces esta zona?"], "El mecánico llegará pronto."]
     };
 
-    function playAudio(archivo, textoFallback) {
+    function playAudio(archivo, fallbackTxt) {
         let audio = new Audio(archivo);
-        audio.play().catch(e => {
-            console.log("Audio falló, usando robot.");
-            speak(textoFallback);
-        });
+        audio.play().catch(() => speak(fallbackTxt));
     }
 
     function speak(txt) {
         window.speechSynthesis.cancel();
         let m = new SpeechSynthesisUtterance(txt);
-        m.lang = 'es-ES';
-        m.rate = 0.85;
+        m.lang = 'es-ES'; m.rate = 0.85;
         window.speechSynthesis.speak(m);
     }
 
@@ -74,6 +88,12 @@
         document.querySelectorAll('.rp-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('b'+id).classList.add('active');
         document.getElementById('chat').innerHTML = "";
+        document.getElementById('next-trigger').style.display = "none";
+        next();
+    }
+
+    function avanzarManual() {
+        document.getElementById('next-trigger').style.display = "none";
         next();
     }
 
@@ -84,46 +104,40 @@
         let audioFile = "";
 
         if (step === 4) {
-            let opciones = ['a', 'b', 'c'];
-            let rand = Math.floor(Math.random() * 3);
-            t = data[current][step][rand];
-            audioFile = `rp${current}_5${opciones[rand]}.m4a`;
+            let ops = ['a', 'b', 'c']; let r = Math.floor(Math.random() * 3);
+            t = data[current][4][r];
+            audioFile = `rp${current}_5${ops[r]}.m4a`;
         } else if (step === 5) {
             audioFile = `rp${current}_6.m4a`;
         } else {
             audioFile = `rp${current}_${step + 1}.m4a`;
         }
 
-        let c = document.getElementById('chat');
-        c.innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
+        document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
         
-        if (current === 1) {
-            playAudio(audioFile, t);
-        } else {
-            speak(t);
-        }
+        if (current === 1) playAudio(audioFile, t);
+        else speak(t);
         
-        c.scrollTop = c.scrollHeight;
+        let chatDiv = document.getElementById('chat');
+        chatDiv.scrollTop = chatDiv.scrollHeight;
         step++;
     }
 
     function send() {
-        // Desbloquear audio en iOS/iPadOS
-        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
         let i = document.getElementById('box');
         if (!i.value) return;
         document.getElementById('chat').innerHTML += `<div class="bubble st">${i.value}</div>`;
         i.value = "";
         
-        // Pausa breve para simular que el examinador escucha
-        setTimeout(next, 800);
+        // Mostrar botón de continuar tras la respuesta del alumno
+        if (step < data[current].length) {
+            document.getElementById('next-trigger').style.display = "block";
+        }
     }
 
     function runMic() {
-        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        let Reco = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!Reco) return alert("Micro no disponible");
+        let Reco = window.webkitSpeechRecognition || window.SpeechRecognition;
+        if (!Reco) return alert("Micro no soportado");
         let r = new Reco(); r.lang = 'es-ES';
         r.onstart = () => document.getElementById('mic').style.background = 'red';
         r.onresult = (e) => {
