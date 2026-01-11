@@ -6,24 +6,25 @@
     <title>LC Oral Master - Señor Martín</title>
     <style>
         :root { --primary: #1a237e; --secondary: #c62828; }
-        body { font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #e5ddd5; }
-        header { background: var(--primary); color: white; padding: 10px; text-align: center; font-weight: bold; }
-        .selector { display: flex; overflow-x: auto; gap: 8px; padding: 10px; background: #fff; border-bottom: 2px solid #ccc; flex-shrink: 0; }
-        .rp-btn { min-width: 90px; padding: 10px; background: #f8f8f8; border: 1px solid #999; border-radius: 8px; font-size: 12px; cursor: pointer; border: 1px solid #ccc; }
-        .active { background: var(--secondary) !important; color: white; }
-        #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .bubble { max-width: 80%; padding: 12px; border-radius: 12px; font-size: 16px; line-height: 1.4; }
-        .ex { align-self: flex-start; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .st { align-self: flex-end; background: #dcf8c6; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        #next-trigger { display: none; margin: 10px auto; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; width: 80%; text-align: center; }
-        .input-area { background: white; padding: 10px 10px 30px 10px; display: flex; gap: 10px; border-top: 1px solid #ccc; }
-        input { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 16px; }
-        .btn { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 50%; font-size: 20px; }
+        body { font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #f0f2f5; }
+        header { background: var(--primary); color: white; padding: 12px; text-align: center; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .selector { display: flex; overflow-x: auto; gap: 8px; padding: 10px; background: #fff; border-bottom: 1px solid #ccc; flex-shrink: 0; }
+        .rp-btn { min-width: 100px; padding: 12px; background: #f8f8f8; border: 1px solid #ddd; border-radius: 10px; font-size: 13px; cursor: pointer; transition: 0.3s; }
+        .active { background: var(--secondary) !important; color: white; border-color: var(--secondary); }
+        #chat { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .bubble { max-width: 85%; padding: 14px; border-radius: 15px; font-size: 16px; line-height: 1.5; position: relative; }
+        .ex { align-self: flex-start; background: white; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-bottom-left-radius: 2px; }
+        .st { align-self: flex-end; background: #dcf8c6; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-bottom-right-radius: 2px; }
+        #next-trigger { display: none; margin: 15px auto; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; width: 85%; text-align: center; font-size: 16px; box-shadow: 0 4px 10px rgba(198,40,40,0.3); }
+        .input-area { background: white; padding: 15px 15px 40px 15px; display: flex; gap: 12px; border-top: 1px solid #eee; }
+        input { flex: 1; padding: 14px 20px; border-radius: 25px; border: 1px solid #ddd; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--primary); }
+        .btn-send { background: var(--primary); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     </style>
 </head>
 <body>
 
-<header>Señor Martín: Simulador Oficial SEC</header>
+<header>LC Oral Master: Simulador Oficial SEC</header>
 
 <div class="selector">
     <div class="rp-btn" id="b1" onclick="iniciarExamen(1)">🏠 1. Cáceres</div>
@@ -35,18 +36,16 @@
 
 <div id="chat"></div>
 
-<button id="next-trigger" onclick="proximaIntervencion()">Escuchar al examinador ⏩</button>
+<button id="next-trigger" onclick="proximaIntervencion()">Escuchar examinador ⏩</button>
 
 <div class="input-area">
-    <button class="btn" id="micBtn" onclick="activarMicro()">🎙️</button>
-    <input type="text" id="userInput" placeholder="Escribe o usa el micro...">
-    <button class="btn" onclick="enviarRespuesta()">▶️</button>
+    <input type="text" id="userInput" placeholder="Responde aquí..." autocomplete="off" spellcheck="true">
+    <button class="btn-send" onclick="enviarRespuesta()">▶️</button>
 </div>
 
 <script>
     let rpActual = null;
     let pasoActual = 0;
-    let recognition;
 
     const contenido = {
         1: ["¡Hola, dígame!", "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.", ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"], "Hemos terminado, gracias."],
@@ -69,9 +68,6 @@
         let input = document.getElementById('userInput');
         if (!input.value) return;
         
-        // Si el micro seguía activo, lo forzamos a parar
-        if (recognition) recognition.stop();
-
         document.getElementById('chat').innerHTML += `<div class="bubble st">${input.value}</div>`;
         input.value = "";
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
@@ -114,40 +110,6 @@
         let m = new SpeechSynthesisUtterance(texto);
         m.lang = 'es-ES'; m.rate = 0.9;
         window.speechSynthesis.speak(m);
-    }
-
-    function activarMicro() {
-        let Reco = window.webkitSpeechRecognition || window.SpeechRecognition;
-        if (!Reco) return alert("Micro no compatible");
-        
-        recognition = new Reco();
-        recognition.lang = 'es-ES';
-        recognition.continuous = false; // Importante para que pare solo
-        recognition.interimResults = false;
-
-        recognition.onstart = () => {
-            document.getElementById('micBtn').style.background = 'red';
-            document.getElementById('userInput').placeholder = "Escuchando...";
-        };
-
-        recognition.onresult = (e) => {
-            let resultado = e.results[0][0].transcript;
-            document.getElementById('userInput').value = resultado;
-            document.getElementById('micBtn').style.background = '#1a237e';
-            // Una vez transcribe, el usuario solo tiene que darle a PLAY
-        };
-
-        recognition.onerror = (e) => {
-            document.getElementById('micBtn').style.background = '#1a237e';
-            console.error("Error micro:", e.error);
-        };
-
-        recognition.onend = () => {
-            document.getElementById('micBtn').style.background = '#1a237e';
-            document.getElementById('userInput').placeholder = "Escribe o usa el micro...";
-        };
-
-        recognition.start();
     }
 </script>
 </body>
