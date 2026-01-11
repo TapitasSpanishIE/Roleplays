@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SEC Practice - Sr. Martín</title>
     <style>
-        :root { --primary: #2c3e50; --secondary: #e74c3c; --accent: #3498db; --light-bg: #ecf0f1; --feedback: #2980b9; }
+        :root { --primary: #2c3e50; --secondary: #e74c3c; --accent: #3498db; --light-bg: #ecf0f1; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--light-bg); color: #333; overflow: hidden; }
         
         /* Modal de Bienvenida */
@@ -24,15 +24,14 @@
         
         #candidate-card { background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; margin: 10px; border-radius: 4px; min-height: 90px; flex-shrink: 0; display: none; position: relative; }
         .card-context { font-style: italic; color: #7f8c8d; margin-bottom: 8px; font-size: 0.85em; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .current-prompt { font-weight: bold; color: #2c3e50; font-size: 0.95em; padding-right: 50px; line-height: 1.4; }
+        .current-prompt { font-weight: bold; color: #2c3e50; font-size: 0.95em; line-height: 1.4; }
         
-        .btn-feedback { position: absolute; right: 10px; bottom: 10px; background: var(--feedback); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-weight: bold; font-size: 22px; display: none; z-index: 100; }
-
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; background: #f9f9f9; }
-        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 16px; line-height: 1.4; }
-        .ex { align-self: flex-start; background: white; border: 1px solid #dee2e6; }
+        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 16px; line-height: 1.4; position: relative; }
+        .ex { align-self: flex-start; background: white; border: 1px solid #dee2e6; cursor: pointer; transition: background 0.2s; }
+        .ex:active { background: #f0f0f0; }
+        .ex::after { content: ' 🔊'; font-size: 0.8em; opacity: 0.5; }
         .st { align-self: flex-end; background: #dcf8c6; color: #000; }
-        .feedback-box { font-size: 0.9em; color: var(--feedback); background: #e1f5fe; padding: 12px; border-radius: 10px; border-left: 5px solid var(--feedback); margin: 5px 0; align-self: center; width: 90%; }
         
         #next-trigger { display: none; margin: 10px auto; padding: 15px; background: var(--secondary); color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; width: 85%; font-size: 16px; flex-shrink: 0; }
 
@@ -47,7 +46,7 @@
     <div class="modal-content">
         <h2>¡Bienvenidos a TapitasSpanishIE!</h2>
         <p class="welcome-msg">I hope you find this Role Play simulator very useful for your Leaving Cert preparation. ¡Mucho ánimo!</p>
-        <p><b>1. Choose Scenario.</b><br><b>2. Red Button:</b> Listen to Examiner.<br><b>3. Blue Arrow:</b> Send your answer (speak or type).<br><b>4. "?" Button:</b> See model answer.</p>
+        <p><b>1. Select a Topic.</b><br><b>2. Press Red Button</b> to hear the Examiner.<br><b>3. Use your Microphone 🎤</b> (or type) to answer, then press <b>▶️</b> to send.<br><b>4. Tip:</b> Tap the Examiner's message to repeat the audio.</p>
         <button class="btn-close" onclick="document.getElementById('modal-instrucciones').style.display='none'">START PRACTICE</button>
     </div>
 </div>
@@ -68,7 +67,6 @@
 <div id="candidate-card">
     <div class="card-context" id="card-context"></div>
     <div class="current-prompt" id="current-prompt"></div>
-    <button class="btn-feedback" id="feedbackBtn" onclick="mostrarSugerencia()">?</button>
 </div>
 
 <div id="chat"></div>
@@ -83,6 +81,8 @@
     let rpActual = null;
     let pasoActual = 0;
     let speaking = false;
+    let lastAudioPath = "";
+    let lastText = "";
 
     const database = {
         1: {
@@ -95,25 +95,38 @@
                 "Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña y se puede andar desde las afueras a la Plaza Mayor en media hora.",
                 ["¿Has estado alguna vez en España?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"],
                 "¡Mucha suerte en Cáceres!"
-            ],
-            sugerencias: ["Hola, voy a ir de ERASMUS el año que viene. ¿Podría darme algún consejo sobre el alojamiento?","Preferiría vivir cerca de la universidad porque el año pasado viví en las afueras de Dublín y no me gustó.","Pasaba demasiado tiempo viajando. Si pudiera dedicar ese tiempo a estudiar, sacaría mejores notas.","Bueno, el clima es mucho mejor que en Irlanda, así que consideraré todas las zonas aunque preferiría el centro.","(Responde libremente...)",""]
+            ]
         },
-        // Mantenemos los demás escenarios igual pero asegurando que el paso 5 sea interactivo
-        2: { context: "Portátil roto Ávila.", prompts: ["1. Screen broken.","2. Slipped.","3. 200€ vs 300€.","4. Copy files.","5. Answer question.","Fin."], dialogs: ["¡Hola!","¿Cómo se rompió?","Cuesta 200 euros.","¿Lo compras?",["¿Qué marca es?","¿Usas mucho el ordenador?"],"¡Fin!"], sugerencias: ["Se rompió la pantalla...","Me resbalé...","He visto uno nuevo...","Lo compro si...","(Respuesta...)",""]},
-        3: { context: "Camper Van.", prompts: ["1. July.","2. Mother driving.","3. Careful driver.","4. Cervantes.","5. Answer question.","Fin."], dialogs: ["¡Dígame!","+25 años.","Perfecto.","¿Ruta?",["¿Te gusta acampar?","¿Mar o montaña?"],"¡Buen viaje!"], sugerencias: ["Alquiler julio...","Madre conduce...","20 años experiencia...","Cervantes...","(Respuesta...)",""]},
-        4: { context: "Plásticos.", prompts: ["1. Ban.","2. Oceans.","3. Biodegradable.","4. Citizens.","5. Answer question.","Fin."], dialogs: ["¿Contento?","¿Importante?","¿Alternativas?","¿Qué más?",["¿Reciclas?","¿Clima?"],"¡Adiós!"], sugerencias: ["Prohibición UE...","Agua limpia...","Papel reciclado...","Responsabilidad...","(Respuesta...)",""]},
-        5: { context: "Avería AP-6.", prompts: ["1. Broken down.","2. Exit 156.","3. Replacement.","4. Red SEAT.","5. Answer question.","Fin."], dialogs: ["Hola.","¿Señal?","Grúa.","¿Coche?",["¿Sabes cambiar ruedas?","¿Has esperado mucho?"],"¡Vamos pronto!"], sugerencias: ["Avería en AP-6...","Salida 156...","Coche sustitución...","SEAT Ibiza rojo...","(Respuesta...)",""]}
+        2: {
+            context: "Portátil roto Ávila.",
+            prompts: ["1. Screen broken.","2. Slipped.","3. 200€ vs 300€.","4. Copy files.","5. Answer question.","Fin."],
+            dialogs: ["¡Hola! ¿En qué puedo ayudarte?","¿Cómo se rompió?","Arreglarlo cuesta 200 euros.","Esta semana hay oferta. ¿Lo quieres? ",["¿Qué marca es?","¿Usas mucho el ordenador?"],"¡Examen finalizado!"]
+        },
+        3: {
+            context: "Alquiler Camper Van.",
+            prompts: ["1. July.","2. Mother driving.","3. Careful driver.","4. Cervantes.","5. Answer question.","Fin."],
+            dialogs: ["¡Dígame!","Debes ser mayor de 25 años.","Ah, entonces ella puede conducir.","¿Tenéis una ruta ya pensada? ",["¿Te gusta viajar de acampada?","¿Prefieres mar o montaña?"],"¡Buen viaje!"]
+        },
+        4: {
+            context: "Problema de plásticos.",
+            prompts: ["1. Ban.","2. Oceans.","3. Biodegradable.","4. Citizens.","5. Answer question.","Fin."],
+            dialogs: ["¿Por qué estás tan contento?","¿Es buena idea prohibirlos?","¿Hay alternativas al plástico?","¿Qué más podemos hacer los ciudadanos?",["¿Reciclas en casa?","¿Qué opinas del cambio climático?"],"¡Muy bien!"]
+        },
+        5: {
+            context: "Avería coche AP-6.",
+            prompts: ["1. Broken down.","2. Exit 156.","3. Replacement.","4. Red SEAT.","5. Answer question.","Fin."],
+            dialogs: ["Hola, seguros. ¿Qué ha pasado?","¿Ves alguna señal cerca?","Enviamos una grúa inmediatamente.","¿Cómo es el coche exactamente?",["¿Sabes cambiar ruedas?","¿Has esperado mucho?"],"¡Llegamos en 15 minutos!"]
+        }
     };
 
     function setInputEnabled(enabled) {
         document.getElementById('userInput').disabled = !enabled;
         document.getElementById('sendBtn').disabled = !enabled;
-        document.getElementById('feedbackBtn').style.display = enabled ? "block" : "none";
         if(enabled) {
-            document.getElementById('userInput').placeholder = "Escribe o usa el micro 🎤";
+            document.getElementById('userInput').placeholder = "Speak or type 🎤";
             document.getElementById('userInput').focus();
         } else {
-            document.getElementById('userInput').placeholder = "Esperando...";
+            document.getElementById('userInput').placeholder = "Waiting...";
         }
     }
 
@@ -130,18 +143,6 @@
         setInputEnabled(false);
     }
 
-    function mostrarSugerencia() {
-        if(!rpActual) return;
-        const sug = database[rpActual].sugerencias[pasoActual];
-        if(sug) {
-            const fb = document.createElement('div');
-            fb.className = 'feedback-box';
-            fb.innerHTML = `💡 <b>Model:</b> ${sug}`;
-            document.getElementById('chat').appendChild(fb);
-            document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
-        }
-    }
-
     function enviarRespuesta() {
         if (!rpActual || speaking) return;
         const input = document.getElementById('userInput');
@@ -155,6 +156,25 @@
         setTimeout(() => { document.getElementById('next-trigger').style.display = "block"; }, 300);
     }
 
+    function reproducirAudio(path, fallbackText) {
+        window.speechSynthesis.cancel();
+        const audio = new Audio(path);
+        audio.play().then(() => {
+            audio.onended = () => { speaking = false; checkEnableInput(); };
+        }).catch(() => {
+            const m = new SpeechSynthesisUtterance(fallbackText);
+            m.lang = 'es-ES'; m.rate = 0.9;
+            m.onend = () => { speaking = false; checkEnableInput(); };
+            window.speechSynthesis.speak(m);
+        });
+    }
+
+    function checkEnableInput() {
+        if (pasoActual < database[rpActual].dialogs.length - 1) {
+            setInputEnabled(true);
+        }
+    }
+
     function proximaIntervencion() {
         if (!rpActual || speaking) return;
         document.getElementById('next-trigger').style.display = "none";
@@ -165,35 +185,27 @@
 
         if (Array.isArray(t)) {
             let idx = Math.floor(Math.random() * t.length);
-            t = t[idx]; // Texto exacto: 5a, 5b o 5c
+            t = t[idx];
             let suffix = ['a', 'b', 'c'][idx];
             audioPath = `rp${rpActual}_5${suffix}.mp3`;
         } else {
             audioPath = `rp${rpActual}_${pasoActual + 1}.mp3`;
         }
 
-        document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Ex:</b> ${t}</div>`;
+        lastAudioPath = audioPath;
+        lastText = t;
+
+        const bubble = document.createElement('div');
+        bubble.className = "bubble ex";
+        bubble.innerHTML = `<b>Ex:</b> ${t}`;
+        // Al hacer clic en la burbuja, se repite
+        bubble.onclick = () => reproducirAudio(audioPath, t);
+        
+        document.getElementById('chat').appendChild(bubble);
         document.getElementById('current-prompt').innerHTML = `<b>Prompt:</b> ${database[rpActual].prompts[pasoActual]}`;
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
-        const finalizarTurno = () => {
-            speaking = false;
-            // SIEMPRE habilitamos el input si NO es el paso final (despedida)
-            // En el RP1, la despedida es el paso 6 (índice 5), por lo que en el paso 5 (sorpresa) DEBE habilitarse.
-            if (pasoActual < database[rpActual].dialogs.length - 1) {
-                setInputEnabled(true);
-            }
-        };
-
-        const audio = new Audio(audioPath);
-        audio.play().then(() => { audio.onended = finalizarTurno; }).catch(() => { hablarRobot(t, finalizarTurno); });
-    }
-
-    function hablarRobot(texto, cb) {
-        window.speechSynthesis.cancel();
-        const m = new SpeechSynthesisUtterance(texto);
-        m.lang = 'es-ES'; m.rate = 0.9; m.onend = cb;
-        window.speechSynthesis.speak(m);
+        reproducirAudio(audioPath, t);
     }
 </script>
 </body>
