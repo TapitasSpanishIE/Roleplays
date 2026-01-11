@@ -32,9 +32,7 @@
     <div class="rp-btn" id="b5" onclick="start(5)">🚗 5. Avería</div>
 </div>
 
-<div id="chat">
-    <div class="bubble ex"><b>Sñr Martín:</b> Pulsa un Role Play para empezar el examen según la tarjeta oficial.</div>
-</div>
+<div id="chat"></div>
 
 <div class="input-area">
     <button class="btn" id="mic" onclick="runMic()">🎙️</button>
@@ -43,15 +41,59 @@
 </div>
 
 <script>
-    let current = null; let step = 0;
+    let current = null; 
+    let step = 0;
 
     const data = {
-        1: ["¡Hola, dígame!", "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.", "¿Has estado alguna vez en Extremadura?", "¡Perfecto! Hemos terminado."],
-        2: ["Buenos días. ¿En qué puedo ayudarte?", "Veo que tienes un problema con el portátil. ¿Qué le ha pasado exactamente a la pantalla?", "¡Qué mala suerte! Y mañana es un día importante. ¿Tienes una copia de seguridad de tus archivos?", "Mira, tengo una oferta: te lo puedo arreglar hoy mismo por trescientos euros. ¿Qué te parece?", "¿Necesitas el portátil para el colegio o para la universidad?", "Examen finalizado. ¡Buen trabajo!"],
-        3: ["Hola, buenos días. ¿Quieres alquilar una autocaravana?", "¿Quién va a conducir la caravana?", "¿Tu madre ha tenido algún accidente últimamente?", "Castilla-La Mancha es una zona preciosa. ¿Qué ciudades queréis visitar?", "¿Cuántas personas vais a viajar en total?", "Role Play completado."],
-        4: ["¡Hola! Pareces muy contento/a. ¿Por qué?", "Es una noticia fantástica. ¿Sabes cuándo entrará en vigor la prohibición del Parlamento Europeo?", "Es verdad. ¿Qué materiales crees que se deberían usar ahora?", "En casa intentamos reciclar siempre. ¿Y tú?", "¿Crees que los jóvenes están más concienciados que los adultos?", "¡Muy bien! Hemos terminado."],
-        5: ["¡Hola, buenas tardes!", "Debes estar entre Medina del Campo y Tordesillas, cerca de la salida ciento cincuenta y seis. ¿Ves alguna señal de tráfico por ahí?", "Claro que sí. Voy a ayudarte inmediatamente. ¿Me puedes describir tu coche?", "¿Llevas mucho tiempo esperando?", "¿Es la primera vez que tienes un problema con este coche?", "El mecánico llegará pronto. ¡Suerte!"]
+        1: [
+            "¡Hola, dígame!", 
+            "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", 
+            "¿Por qué?", 
+            "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.",
+            ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"],
+            "Hemos terminado, gracias."
+        ],
+        2: [
+            "Buenos días. ¿En qué puedo ayudarte?", 
+            "Veo que tienes un problema con el portátil. ¿Qué le ha pasado exactamente a la pantalla?", 
+            "¡Qué mala suerte! Y mañana es un día importante. ¿Tienes una copia de seguridad de tus archivos?", 
+            "Mira, tengo una oferta: te lo puedo arreglar hoy mismo por trescientos euros. ¿Qué te parece?", 
+            ["¿Usas mucho el portátil para tus estudios?", "¿Prefieres Mac o Windows?", "¿Has tenido problemas técnicos antes?"],
+            "Examen finalizado. ¡Buen trabajo!"
+        ],
+        3: [
+            "Hola, buenos días. ¿Quieres alquilar una autocaravana?", 
+            "¿Quién va a conducir la caravana?", 
+            "¿Tu madre ha tenido algún accidente últimamente?", 
+            "Castilla-La Mancha es una zona preciosa. ¿Qué ciudades queréis visitar?", 
+            ["¿Te gusta acampar al aire libre?", "¿Prefieres viajar en verano o en invierno?", "¿Has conducido alguna vez un vehículo grande?"],
+            "Role Play completado."
+        ],
+        4: [
+            "¡Hola! Pareces muy contento/a. ¿Por qué?", 
+            "Es una noticia fantástica. ¿Sabes cuándo entrará en vigor la prohibición del Parlamento Europeo?", 
+            "Es verdad. ¿Qué materiales crees que se deberían usar ahora?", 
+            "En casa intentamos reciclar siempre. ¿Y tú?", 
+            ["¿Crees que tu colegio recicla lo suficiente?", "¿Qué opinas del cambio climático?", "¿Usas botellas de cristal o de plástico?"],
+            "¡Muy bien! Hemos terminado."
+        ],
+        5: [
+            "¡Hola, buenas tardes!", 
+            "Debes estar entre Medina del Campo y Tordesillas, cerca de la salida ciento cincuenta y seis. ¿Ves alguna señal de tráfico por ahí?", 
+            "Claro que sí. Voy a ayudarte inmediatamente. ¿Me puedes describir tu coche?", 
+            "¿Llevas mucho tiempo esperando?", 
+            ["¿Has llamado ya a tu familia para avisar?", "¿Sabes cambiar una rueda tú solo?", "¿Es la primera vez que visitas esta zona?"],
+            "El mecánico llegará pronto. ¡Suerte!"
+        ]
     };
+
+    function playAudio(archivo, textoFallback) {
+        let audio = new Audio(archivo);
+        audio.play().catch(e => {
+            console.log("Audio no encontrado, usando robot.");
+            speak(textoFallback);
+        });
+    }
 
     function speak(txt) {
         window.speechSynthesis.cancel();
@@ -71,10 +113,33 @@
 
     function next() {
         if (!current || step >= data[current].length) return;
+        
         let t = data[current][step];
+        let audioFile = "";
+
+        // Lógica de aleatoriedad para preguntas sorpresa (Paso 4 en el índice 0)
+        if (step === 4) {
+            let opciones = ['a', 'b', 'c'];
+            let rand = Math.floor(Math.random() * 3);
+            t = data[current][step][rand];
+            audioFile = `rp${current}_5${opciones[rand]}.m4a`;
+        } else if (step === 5) {
+            audioFile = `rp${current}_5.m4a`; // El cierre
+        } else {
+            audioFile = `rp${current}_${step + 1}.m4a`;
+        }
+
         let c = document.getElementById('chat');
         c.innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
-        speak(t);
+        
+        // Solo intenta audio si es RP1 (que es el que usted tiene grabado)
+        // Para los demás, usará el robot hasta que suba los audios
+        if (current === 1) {
+            playAudio(audioFile, t);
+        } else {
+            speak(t);
+        }
+        
         c.scrollTop = c.scrollHeight;
         step++;
     }
