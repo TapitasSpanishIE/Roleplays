@@ -16,20 +16,10 @@
         .ex { align-self: flex-start; background: white; border-bottom-left-radius: 2px; }
         .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; }
         
-        /* Botón de Continuar sugerido por el usuario */
         #next-trigger { 
-            display: none; 
-            margin: 10px auto; 
-            padding: 15px 30px; 
-            background: var(--secondary); 
-            color: white; 
-            border: none; 
-            border-radius: 30px; 
-            font-weight: bold; 
-            font-size: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            cursor: pointer;
-            flex-shrink: 0;
+            display: none; margin: 10px auto; padding: 15px 30px; background: var(--secondary); 
+            color: white; border: none; border-radius: 30px; font-weight: bold; font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; flex-shrink: 0;
         }
 
         .input-area { background: white; padding: 15px 15px 40px 15px; display: flex; gap: 10px; border-top: 2px solid var(--primary); }
@@ -55,13 +45,14 @@
 
 <div class="input-area">
     <button class="btn" id="mic" onclick="runMic()">🎙️</button>
-    <input type="text" id="box" placeholder="Tu respuesta...">
+    <input type="text" id="box" placeholder="Tu respuesta aparecerá aquí...">
     <button class="btn" onclick="send()">▶️</button>
 </div>
 
 <script>
     let current = null; 
     let step = 0;
+    let recognition;
 
     const data = {
         1: ["¡Hola, dígame!", "Entiendo que vas a estudiar un año en Cáceres. ¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es pequeña y se puede ir andando a la Plaza Mayor en media hora desde las afueras.", ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"], "Hemos terminado, gracias."],
@@ -99,7 +90,6 @@
 
     function next() {
         if (!current || step >= data[current].length) return;
-        
         let t = data[current][step];
         let audioFile = "";
 
@@ -114,7 +104,6 @@
         }
 
         document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
-        
         if (current === 1) playAudio(audioFile, t);
         else speak(t);
         
@@ -124,12 +113,17 @@
     }
 
     function send() {
+        // Si el micrófono está encendido, lo apagamos a la fuerza
+        if (recognition) {
+            recognition.stop();
+            document.getElementById('mic').style.background = '#1a237e';
+        }
+
         let i = document.getElementById('box');
         if (!i.value) return;
         document.getElementById('chat').innerHTML += `<div class="bubble st">${i.value}</div>`;
         i.value = "";
         
-        // Mostrar botón de continuar tras la respuesta del alumno
         if (step < data[current].length) {
             document.getElementById('next-trigger').style.display = "block";
         }
@@ -138,15 +132,30 @@
     function runMic() {
         let Reco = window.webkitSpeechRecognition || window.SpeechRecognition;
         if (!Reco) return alert("Micro no soportado");
-        let r = new Reco(); r.lang = 'es-ES';
-        r.onstart = () => document.getElementById('mic').style.background = 'red';
-        r.onresult = (e) => {
-            document.getElementById('box').value = e.results[0][0].transcript;
-            document.getElementById('mic').style.background = '#1a237e';
-            send();
+        
+        recognition = new Reco();
+        recognition.lang = 'es-ES';
+        recognition.continuous = false;
+        recognition.interimResults = true;
+
+        recognition.onstart = () => {
+            document.getElementById('mic').style.background = 'red';
+            document.getElementById('box').value = ""; 
         };
-        r.onerror = () => document.getElementById('mic').style.background = '#1a237e';
-        r.start();
+
+        recognition.onresult = (e) => {
+            let text = "";
+            for (let i = e.resultIndex; i < e.results.length; ++i) {
+                text += e.results[i][0].transcript;
+            }
+            document.getElementById('box').value = text;
+        };
+
+        recognition.onend = () => {
+            document.getElementById('mic').style.background = '#1a237e';
+        };
+
+        recognition.start();
     }
 </script>
 </body>
