@@ -8,29 +8,52 @@
         :root { --primary: #2c3e50; --secondary: #e74c3c; --accent: #3498db; --light-bg: #ecf0f1; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: var(--light-bg); color: #333; }
         header { background: var(--primary); color: white; padding: 15px; text-align: center; font-size: 1.1em; font-weight: bold; }
-        .disclaimer { font-size: 0.75em; font-weight: normal; display: block; margin-top: 4px; color: #bdc3c7; }
+        
+        /* Estilos del Manual / Modal */
+        #modal-instrucciones { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; z-index:1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 15px; max-width: 85%; text-align: center; }
+        .modal-content h2 { color: var(--secondary); margin-top: 0; }
+        .modal-content ul { text-align: left; font-size: 0.9em; line-height: 1.6; }
+        .btn-close { background: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+
         .selector { display: flex; overflow-x: auto; gap: 10px; padding: 12px; background: #fff; border-bottom: 1px solid #ddd; flex-shrink: 0; }
         .rp-btn { min-width: 110px; padding: 10px; background: #fff; border: 2px solid #ddd; border-radius: 8px; font-size: 13px; cursor: pointer; text-align: center; }
         .active { border-color: var(--secondary); background: #fdf2f2; font-weight: bold; color: var(--secondary); }
+        
         #candidate-card { background: #fffde7; border-left: 5px solid #f1c40f; padding: 15px; margin: 10px; border-radius: 4px; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .card-context { font-style: italic; color: #7f8c8d; margin-bottom: 10px; border-bottom: 1px solid #e1e1e1; padding-bottom: 8px; font-size: 0.9em; line-height: 1.4; }
         .current-prompt { font-weight: bold; color: #2c3e50; background: #fdf9c4; padding: 5px; border-radius: 3px; font-size: 0.95em; }
+
         #chat { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .bubble { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 16px; line-height: 1.4; }
         .ex { align-self: flex-start; background: white; border: 1px solid #dee2e6; border-bottom-left-radius: 2px; }
         .st { align-self: flex-end; background: #dcf8c6; border-bottom-right-radius: 2px; }
+        
         #next-trigger { display: none; margin: 10px auto; padding: 14px 24px; background: var(--secondary); color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; width: 85%; font-size: 16px; box-shadow: 0 4px 12px rgba(231,76,60,0.3); }
+
         .input-area { background: white; padding: 15px 15px 35px 15px; display: flex; gap: 10px; border-top: 1px solid #ddd; }
         input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #ccc; font-size: 16px; outline: none; }
         .btn-send { background: var(--accent); color: white; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; }
-        .btn-send:disabled { background: #bdc3c7; }
     </style>
 </head>
 <body>
 
+<div id="modal-instrucciones">
+    <div class="modal-content">
+        <h2>How to use this Simulator</h2>
+        <ul>
+            <li><b>1. Select a Topic:</b> Choose an exam scenario at the top.</li>
+            <li><b>2. Follow the Prompt:</b> Read the yellow card. It tells you what to say in Spanish.</li>
+            <li><b>3. Recording:</b> Tap the ⏩ button to hear the examiner. </li>
+            <li><b>4. Speaking:</b> Use the 🎤 icon on your iPad keyboard to dictate your answer or type it.</li>
+            <li><b>5. Surprise Question:</b> At the end, there is no prompt. Just answer naturally!</li>
+        </ul>
+        <button class="btn-close" onclick="document.getElementById('modal-instrucciones').style.display='none'">Got it!</button>
+    </div>
+</div>
+
 <header>
     SEC Spanish Oral Practice
-    <span class="disclaimer">Based on official Leaving Certificate Role Plays</span>
 </header>
 
 <div class="selector">
@@ -59,31 +82,32 @@
     let rpActual = null;
     let pasoActual = 0;
     let speaking = false;
+    let letraAzar = ""; // Para guardar si salió a, b o c
 
     const database = {
         1: {
-            context: "Vas de ERASMUS a la Universidad de Extremadura en Cáceres. Necesitas alojamiento y llamas por teléfono a la universidad.<br><i>You are going on Erasmus to Caceres and need accommodation advice.</i>",
-            prompts: ["Say you will be on ERASMUS next year. Say you don't know anybody in Caceres and ask for advice about accommodation.", "Say you would prefer to live near the university because last year you lived in the outskirts of Dublin and really didn't like it.", "Say you spent too much time travelling. Say that if you could spend that time studying you would get good grades.", "Say that's not far and the climate is much better than in Ireland so you will consider all areas even though you would prefer the city centre.", "Respond to the examiner's question.", "Examen finalizado."],
-            dialogs: ["¡Hola, dígame!", "¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es muy pequeña y se puede andar a todas partes.", ["¿Has estado alguna vez en Cáceres?", "¿Te gusta vivir en España?"], "Hemos terminado, gracias."]
+            context: "Vas de ERASMUS a Cáceres. <br><i>You are going on Erasmus to Caceres and need accommodation advice.</i>",
+            prompts: ["Say that you will be on ERASMUS in the university for the coming academic year. Say you don't know anybody in Caceres and ask for advice about accommodation.", "Say that you would prefer to live near the university because last year you lived in the outskirts of Dublin and really didn't like it.", "Say you spent too much time travelling. Say that if you could spend that time studying you would get good grades.", "Say the climate is better than in Ireland so you will consider all areas even though you would prefer the city centre.", "Listen and respond to the examiner's surprise question.", "Role play finished."],
+            dialogs: ["¡Hola, dígame!", "¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón, pero Cáceres es muy pequeña y se puede andar a todas partes.", ["¿Has estado alguna vez en Cáceres?", "¿Qué es lo que más te gusta de vivir en España?", "¿Por qué quieres estudiar en España?"], "Hemos terminado, gracias."]
         },
         2: {
-            context: "Estás en Ávila y se te ha roto el portátil. Lo llevas a arreglar.<br><i>Your laptop is broken and you take it to a repair shop in Avila.</i>",
+            context: "Estás en Ávila y se te ha roto el portátil.<br><i>Your laptop is broken and you take it to a repair shop in Avila.</i>",
             prompts: ["Say your laptop fell and the screen is broken. You have an essay due tomorrow and the only copy is there.", "Say you were late for the bus, you slipped and the laptop fell on the ground.", "Say it's good it can be fixed but you saw the same model for sale in the window for 300 euro.", "Say you will buy it if they copy your files to the new drive and give you a free bag.", "Respond to the examiner's question.", "Examen finalizado."],
             dialogs: ["¡Hola! ¿En qué puedo ayudarte?", "Vamos a ver. ¿Qué le pasó?", "Necesitas una nueva pantalla. Cuesta 200 euros.", "Hay una oferta especial esta semana. ¿Quieres comprarlo?", ["¿Prefieres Mac o Windows?", "¿Usas mucho el ordenador?"], "Examen finalizado."]
         },
         3: {
-            context: "Vas a España de vacaciones y tu familia quiere alquilar una autocaravana.<br><i>You are going to Spain and your family wants to hire a camper van.</i>",
-            prompts: ["Say you are a student from Ireland interested in hiring a camper van for two weeks in July.", "Say your mother will be driving because you don't have your licence yet. You are getting lessons.", "Say she has driven on the right in Europe for 20 years and is a very careful driver.", "Say you hope to travel through Castilla-La Mancha to see the land of Cervantes, far from tourists.", "Respond to the examiner's question.", "Examen finalizado."],
+            context: "Vas a España y quieres alquilar una autocaravana.<br><i>You want to hire a camper van in Spain.</i>",
+            prompts: ["Say you are a student from Ireland interested in hiring a camper van for two weeks in July.", "Say your mother will be driving because you don't have your licence yet.", "Say she has driven on the right in Europe for 20 years and is a very careful driver.", "Say you hope to travel through Castilla-La Mancha to see the land of Cervantes.", "Respond to the examiner's question.", "Examen finalizado."],
             dialogs: ["¡Hola! ¿En qué puedo ayudarte?", "Para alquilar hace falta tener al menos 25 años y experiencia.", "Muy bien. Tu madre cumple los requisitos.", "¡Fenomenal! ¿Tenéis el itinerario previsto?", ["¿Te gusta acampar?", "¿Prefieres el mar o la montaña?"], "Role Play completado."]
         },
         4: {
-            context: "Estás preocupado por la contaminación de plásticos y has oído buenas noticias.<br><i>You are worried about plastic pollution and heard good news.</i>",
-            prompts: ["The European Parliament has agreed to ban single use plastics (knives, forks, straws...).", "Say it's essential and will be good for the waters. Plastic is a serious problem in rivers and oceans.", "Say there are lots of things we can do, like using recycled paper or biodegradable materials.", "Say no, citizens need to be more responsible. We could cycle, use public transport or walk more.", "Respond to the examiner's question.", "Examen finalizado."],
+            context: "Contaminación de plásticos.<br><i>Plastic pollution.</i>",
+            prompts: ["The European Parliament has agreed to ban single use plastics.", "Say it's essential and will be good for the waters.", "Say there are lots of things we can do, like using recycled paper.", "Say no, citizens need to be more responsible.", "Respond to the examiner's question.", "Examen finalizado."],
             dialogs: ["Pareces muy contento, ¿por qué?", "¿Es importante prohibir plásticos de usar y tirar?", "¿Podemos hacer algo más?", "¿Y ya está?", ["¿Tu colegio recicla?", "¿Qué opinas del cambio climático?"], "¡Muy bien!"]
         },
         5: {
-            context: "Tu coche se ha parado en la autopista AP-6 y llamas a tu seguro.<br><i>Your car has broken down on the AP-6 motorway and you ring your insurance company.</i>",
-            prompts: ["Say your car has just broken down and that you are on the AP-6 motorway.", "Say you passed through the toll half an hour ago. You see the exit sign 156 in the distance.", "Ask if they can send out a mechanic or a tow truck because the problem is serious.", "Ask for a replacement car. Say it's a red SEAT Ibiza (4620 CFK) bought second hand from your aunt.", "Respond to the examiner's question.", "Examen finalizado."],
+            context: "Avería de coche en la AP-6.<br><i>Car breakdown on the motorway.</i>",
+            prompts: ["Say your car has broken down on the AP-6.", "Say you passed the toll half an hour ago. You see the exit sign 156.", "Ask for a mechanic or tow truck.", "Say it's a red SEAT Ibiza (4620 CFK).", "Respond to the examiner's question.", "Examen finalizado."],
             dialogs: ["Hola, buenas tardes.", "¿Hay alguna señal de tráfico por ahí?", "Voy a arreglarlo todo inmediatamente.", "¿Me puedes describir tu coche?", ["¿Sabes cambiar una rueda?", "¿Llevas mucho esperando?"], "El mecánico llegará pronto."]
         }
     };
@@ -93,7 +117,7 @@
         const btn = document.getElementById('sendBtn');
         input.disabled = !enabled;
         btn.disabled = !enabled;
-        input.placeholder = enabled ? "Write in Spanish..." : (speaking ? "Listening..." : "Waiting...");
+        input.placeholder = enabled ? "Write or use the Microphone..." : "Waiting...";
     }
 
     function seleccionarRP(id) {
@@ -114,18 +138,12 @@
         const input = document.getElementById('userInput');
         const texto = input.value.trim();
         if (!texto) return;
-
-        // SACUDIDA PARA IPAD: Despierta el motor de audio al hacer clic
         window.speechSynthesis.speak(new SpeechSynthesisUtterance("")); 
-
         document.getElementById('chat').innerHTML += `<div class="bubble st">${texto}</div>`;
         input.value = "";
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
-        
         setInputEnabled(false);
-        setTimeout(() => {
-            document.getElementById('next-trigger').style.display = "block";
-        }, 500);
+        setTimeout(() => { document.getElementById('next-trigger').style.display = "block"; }, 500);
     }
 
     function proximaIntervencion() {
@@ -134,29 +152,33 @@
         speaking = true;
 
         let t = database[rpActual].dialogs[pasoActual];
-        if (Array.isArray(t)) t = t[Math.floor(Math.random() * t.length)];
+        let audioPath = "";
 
-        const finalizarTurno = () => {
-            speaking = false;
-            pasoActual++;
-            if (pasoActual < database[rpActual].dialogs.length) {
-                setInputEnabled(true);
-            }
-        };
+        // LÓGICA DE AUDIO PARA PREGUNTA SORPRESA (Paso 5)
+        if (Array.isArray(t)) {
+            let indice = Math.floor(Math.random() * t.length);
+            t = t[indice];
+            let letras = ['a', 'b', 'c'];
+            letraAzar = letras[indice];
+            audioPath = `rp${rpActual}_5${letraAzar}.mp3`;
+        } else {
+            audioPath = `rp${rpActual}_${pasoActual + 1}.mp3`;
+        }
 
-        // Mostrar texto y prompt ANTES de intentar el audio
         document.getElementById('chat').innerHTML += `<div class="bubble ex"><b>Examinador:</b> ${t}</div>`;
         document.getElementById('current-prompt').innerHTML = `<b>Prompt:</b> ${database[rpActual].prompts[pasoActual]}`;
         document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
 
-        // Intentar reproducir MP3
-        let audioPath = `rp${rpActual}_${pasoActual + 1}.mp3`;
+        const finalizarTurno = () => {
+            speaking = false;
+            pasoActual++;
+            if (pasoActual < database[rpActual].dialogs.length) setInputEnabled(true);
+        };
+
         const audio = new Audio(audioPath);
-        
         audio.play().then(() => {
             audio.onended = finalizarTurno;
         }).catch(() => {
-            // Si el MP3 falla o no existe, salta al robot
             hablarRobot(t, finalizarTurno);
         });
     }
