@@ -27,7 +27,7 @@
             flex-direction: column; 
         }
         
-        /* Welcome Modal */
+        /* Welcome Modal in English */
         #modal-instrucciones { 
             position: fixed; 
             top:0; left:0; 
@@ -262,7 +262,7 @@
 <div id="modal-instrucciones">
     <div class="modal-content">
         <h2 style="text-align:center">SEC Oral Practice</h2>
-        <p><b>1. Select a Role Play</b> from the top menu.<br><b>2. Red Button:</b> Click to listen to the examiner.<br><b>3. Blue "?" Button:</b> See a sample answer.<br><b>4. White Bubbles:</b> Tap to replay the audio.</p>
+        <p><b>1. Select a Role Play</b> from the menu above.<br><b>2. Red Button:</b> Click to listen to the examiner.<br><b>3. Blue "?" Button:</b> View a sample answer.<br><b>4. White Bubble:</b> Tap to replay the audio.</p>
         <button class="btn-close" onclick="startApp()">START PRACTICE</button>
     </div>
 </div>
@@ -424,7 +424,11 @@
                 "Debes estar entre Medina del Campo y Tordesillas. ¿Hay alguna señal de tráfico por ahí?",
                 "Claro que sí. Voy a arreglarlo todo inmediatamente.",
                 "Por supuesto. ¿Me puedes describir tu coche?",
-                ["¿Cuántas personas viajan contigo?","¿A qué hora tenías que recoger a tus padres?","¿Tienes batería suficiente en el móvil?"],
+                [
+                    "¿Cuántas personas viajan contigo?",
+                    "¿A qué hora tenías que recoger a tus padres?",
+                    "¿Tienes batería suficiente en el móvil?"
+                ],
                 "Hemos terminado, gracias"
             ], 
             sugerencias: [
@@ -447,7 +451,7 @@
         document.getElementById('userInput').disabled = !e; 
         document.getElementById('sendBtn').disabled = !e; 
         document.getElementById('feedbackBtn').style.display = e ? "block" : "none"; 
-        document.getElementById('userInput').placeholder = e ? "Escribe tu respuesta..." : "Escuchando..."; 
+        document.getElementById('userInput').placeholder = e ? "Type your answer..." : "Listening..."; 
     }
 
     function seleccionarRP(id, btn) { 
@@ -459,7 +463,7 @@
         document.getElementById('candidate-card').style.display = "block"; 
         document.getElementById('card-context').innerHTML = database[id].context; 
         document.getElementById('chat').innerHTML = ""; 
-        document.getElementById('current-prompt').innerHTML = "Toca el BOTÓN ROJO para oír al examinador."; 
+        document.getElementById('current-prompt').innerHTML = "Tap the RED BUTTON to hear the Examiner."; 
         document.getElementById('next-trigger').style.display = "block"; 
         setInputEnabled(false); 
     }
@@ -469,7 +473,7 @@
         if(sug) { 
             const fb = document.createElement('div'); 
             fb.className = 'feedback-box'; 
-            fb.innerHTML = `💡 <b>Respuesta modelo:</b> ${sug}`; 
+            fb.innerHTML = `💡 <b>Model Answer:</b> ${sug}`; 
             document.getElementById('chat').appendChild(fb); 
             document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight; 
         } 
