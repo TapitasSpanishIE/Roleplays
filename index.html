@@ -27,7 +27,7 @@
             flex-direction: column; 
         }
         
-        /* Welcome Modal in English */
+        /* Welcome Modal */
         #modal-instrucciones { 
             position: fixed; 
             top:0; left:0; 
@@ -262,7 +262,11 @@
 <div id="modal-instrucciones">
     <div class="modal-content">
         <h2 style="text-align:center">SEC Oral Practice</h2>
-        <p><b>1. Select a Role Play</b> from the menu above.<br><b>2. Red Button:</b> Click to listen to the examiner.<br><b>3. Blue "?" Button:</b> View a sample answer.<br><b>4. White Bubble:</b> Tap to replay the audio.</p>
+        <p><b>1. Select a Role Play</b> from the menu above.<br>
+           <b>2. Red Button:</b> Click to listen to the examiner.<br>
+           <b>3. Your Turn:</b> You can <b>type</b> your answer or use the <b>microphone</b> icon on your keyboard to speak.<br>
+           <b>4. Blue "?" Button:</b> View a sample answer.<br>
+           <b>5. White Bubble:</b> Tap to replay the audio.</p>
         <button class="btn-close" onclick="startApp()">START PRACTICE</button>
     </div>
 </div>
@@ -451,7 +455,7 @@
         document.getElementById('userInput').disabled = !e; 
         document.getElementById('sendBtn').disabled = !e; 
         document.getElementById('feedbackBtn').style.display = e ? "block" : "none"; 
-        document.getElementById('userInput').placeholder = e ? "Type your answer..." : "Listening..."; 
+        document.getElementById('userInput').placeholder = e ? "Type or speak your answer..." : "Listening..."; 
     }
 
     function seleccionarRP(id, btn) { 
