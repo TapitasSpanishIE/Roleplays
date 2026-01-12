@@ -27,7 +27,7 @@
             flex-direction: column; 
         }
         
-        /* Modal de Bienvenida */
+        /* Welcome Modal */
         #modal-instrucciones { 
             position: fixed; 
             top:0; left:0; 
@@ -79,7 +79,6 @@
             display: block; 
         }
         
-        /* Menú Superior */
         .selector { 
             display: flex; 
             overflow-x: auto; 
@@ -109,7 +108,6 @@
             color: var(--secondary); 
         }
         
-        /* Tarjeta del Candidato */
         #candidate-card { 
             background: #fffde7; 
             border-left: 5px solid #f1c40f; 
@@ -156,7 +154,6 @@
             z-index: 100; 
         }
 
-        /* Pantalla de Chat */
         #chat { 
             flex-grow: 1; 
             overflow-y: auto; 
@@ -209,7 +206,6 @@
             width: 90%; 
         }
         
-        /* Controles Inferiores */
         #next-trigger { 
             display: none; 
             margin: 10px auto; 
@@ -266,8 +262,8 @@
 <div id="modal-instrucciones">
     <div class="modal-content">
         <h2 style="text-align:center">SEC Oral Practice</h2>
-        <p><b>1. Selecciona un Role Play</b> arriba.<br><b>2. Botón Rojo:</b> Escucha al examinador.<br><b>3. Botón "?" azul:</b> Ver modelo de respuesta.<br><b>4. Burbuja blanca:</b> Toca para repetir audio.</p>
-        <button class="btn-close" onclick="startApp()">COMENZAR</button>
+        <p><b>1. Select a Role Play</b> from the top menu.<br><b>2. Red Button:</b> Click to listen to the examiner.<br><b>3. Blue "?" Button:</b> See a sample answer.<br><b>4. White Bubbles:</b> Tap to replay the audio.</p>
+        <button class="btn-close" onclick="startApp()">START PRACTICE</button>
     </div>
 </div>
 
@@ -283,7 +279,7 @@
 
 <div id="candidate-card">
     <div class="card-context" id="card-context"></div>
-    <div class="current-prompt" id="current-prompt">Selecciona un escenario para empezar.</div>
+    <div class="current-prompt" id="current-prompt">Select a scenario to begin.</div>
     <button class="btn-feedback" id="feedbackBtn" onclick="mostrarSugerencia()">?</button>
 </div>
 
@@ -291,7 +287,7 @@
 <button id="next-trigger" onclick="proximaIntervencion()">Toca para oír al examinador ⏩</button>
 
 <div class="input-area">
-    <input type="text" id="userInput" placeholder="Esperando..." disabled>
+    <input type="text" id="userInput" placeholder="Waiting..." disabled>
     <button class="btn-send" id="sendBtn" onclick="enviarRespuesta()" disabled>▶️</button>
 </div>
 
@@ -317,7 +313,7 @@
                 "¿Por qué?",
                 "Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña... ",
                 ["¿Has estado alguna vez en España?", "¿Qué es lo que más te gusta de España?", "¿Por qué estudiar en España?"],
-                "¡Mucha suerte en tu año Erasmus!"
+                "Hemos terminado, gracias"
             ],
             sugerencias: [
                 "Hola, voy a ir de ERASMUS el año que viene. No conozco a nadie en Cáceres ¿Podría darme algún consejo sobre el alojamiento?",
@@ -344,7 +340,7 @@
                 "Vas a necesitar una nueva pantalla que cuesta doscientos euros.",
                 "Sí, hay una oferta especial esta semana. ¿Quieres comprarlo?",
                 ["¿De qué marca es tu ordenador?","¿Para qué usas el ordenador normalmente?","¿De qué color te gustaría la funda del ordenador?"],
-                "¡Hemos terminado! Gracias"
+                "Hemos terminado, gracias"
             ], 
             sugerencias: [
                 "Se me cayó el portátil y la pantalla está rota. Lo peor es que tengo que entregar un ensayo mañana y la única copia que tengo está en mi portátil.",
@@ -375,7 +371,7 @@
                     "¿Qué tipo de música os gusta escuchar en el coche?",
                     "¿Qué ciudades te gustaría visitar en vuestro viaje?"
                 ],
-                "¡Buen viaje y disfrutad de la experiencia!"
+                "Hemos terminado, gracias"
             ], 
             sugerencias: [
                 "Soy estudiante y llamo desde Irlanda, me interesa alquilar un cámper durante dos semanas en julio.",
@@ -401,8 +397,8 @@
                 "¿Es importante prohibir plásticos de usar y tirar?",
                 "¿Podemos hacer algo más?",
                 "Y, ¿ya está?",
-                ["¿Qué cosas reciclas tú en tu casa?","¿A qué contenedor tiras las botellas de plástico?","¿Qué opinas tú de las bolsas de plástico?"],
-                "¡Muy bien hecho!"
+                ["¿Qué cosas reciclas tú en tu casa?", "¿Qué haces tú para ayudar al medioambiente?", "¿Qué transporte usas para venir al instituto?"],
+                "Hemos terminado, gracias"
             ], 
             sugerencias: [
                 "El Parlamento Europeo ha convenido prohibir los plásticos de un solo uso, por ejemplo, los cuchillos, los tenedores, las cucharas, las tazas, los platos y las pajitas.",
@@ -429,7 +425,7 @@
                 "Claro que sí. Voy a arreglarlo todo inmediatamente.",
                 "Por supuesto. ¿Me puedes describir tu coche?",
                 ["¿Cuántas personas viajan contigo?","¿A qué hora tenías que recoger a tus padres?","¿Tienes batería suficiente en el móvil?"],
-                "¡Llegamos en 15 minutos!"
+                "Hemos terminado, gracias"
             ], 
             sugerencias: [
                 "Mi coche acaba de averiarse y estoy en la autopista AP-6. No sé exactamente donde estoy pero pasé por el peaje hace media hora.",
