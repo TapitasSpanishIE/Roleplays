@@ -92,25 +92,25 @@
         2: { 
             context: "Portátil roto Ávila.", 
             prompts: ["1. Screen broken.","2. Slipped.","3. 200€ vs 300€.","4. Copy files.","5. Answer question.","Fin."], 
-            dialogs: ["¡Hola! ¿En qué puedo ayudarte?","¿Cómo se rompió exactamente?","Arreglarlo cuesta 200 euros.","Esta semana hay una oferta de un modelo nuevo. ¿Lo quieres? ",["¿Qué marca es tu ordenador?","¿Usas mucho el ordenador para tus estudios?"],"¡Examen finalizado!"], 
+            dialogs: ["¡Hola! ¿En qué puedo ayudarte?","¿Cómo se rompió exactamente?","Arreglarlo cuesta 200 euros.","Esta semana hay una oferta de un modelo nuevo. ¿Lo quieres? ",["¿De qué marca es tu ordenador?","¿Para qué usas el ordenador normalmente?","¿De qué color prefieres la funda nueva?"],"¡Examen finalizado!"], 
             sugerencias: ["Hola, se me ha caído el portátil y la pantalla está rota.","Me resbalé yendo al autobús y se me cayó al suelo.","He visto el mismo modelo por 300 euros en el escaparate.","Lo compraré si pueden copiar mis archivos al ordenador nuevo.","Uso el ordenador para todos mis trabajos de clase y proyectos.",""]
         },
         3: { 
             context: "Alquiler Camper Van.", 
             prompts: ["1. July hire.","2. Mother driving.","3. Careful driver.","4. Cervantes route.","5. Answer question.","Fin."], 
-            dialogs: ["¡Dígame!","Debes ser mayor de 25 años para poder alquilarla.","Ah, entonces ella puede conducir sin problemas.","¿Tenéis una ruta ya pensada para el viaje? ",["¿Te gusta viajar de acampada?","¿Prefieres vacaciones de mar o de montaña?"],"¡Buen viaje y disfrutad de la experiencia!"], 
+            dialogs: ["¡Dígame!","Debes ser mayor de 25 años para poder alquilarla.","Ah, entonces ella puede conducir sin problemas.","¿Tenéis una ruta ya pensada para el viaje? ",["¿A qué hora queréis recoger la furgoneta?","¿Qué tipo de música os gusta escuchar en el coche?","¿Qué ciudades pensáis visitar en vuestro viaje?"],"¡Buen viaje y disfrutad de la experiencia!"], 
             sugerencias: ["Hola, quiero alquilar una autocaravana en el mes de julio.","Mi madre será la que conduzca porque yo no tengo carné todavía.","Ella ha conducido por la derecha durante 20 años y es muy cuidadosa.","Queremos ir a Castilla-La Mancha para ver la tierra de Cervantes.","Me gusta mucho la libertad de poder dormir en cualquier sitio.",""]
         },
         4: { 
             context: "Problema de plásticos.", 
             prompts: ["1. EU ban.","2. Oceans problem.","3. Alternatives.","4. Citizens duty.","5. Answer question.","Fin."], 
-            dialogs: ["¿Por qué estás tan contento hoy?","¿Crees que es buena idea prohibirlos?","¿Hay alternativas reales al uso del plástico?","¿Qué más podemos hacer los ciudadanos por el medio ambiente?",["¿Reciclas habitualmente en casa?","¿Qué opinas sobre el cambio climático?"],"¡Muy bien hecho!"], 
+            dialogs: ["¿Por qué estás tan contento hoy?","¿Crees que es buena idea prohibirlos?","¿Hay alternativas reales al uso del plástico?","¿Qué más podemos hacer los ciudadanos por el medio ambiente?",["¿Qué cosas reciclas tú en tu casa?","¿A qué contenedor tiras las botellas de plástico?","¿Qué opinas tú de las bolsas de plástico?"],"¡Muy bien hecho!"], 
             sugerencias: ["La UE ha acordado prohibir los plásticos de un solo uso.","Es vital porque el plástico es un problema muy serio en los océanos.","Podemos usar materiales biodegradables o simplemente papel.","Debemos ser más responsables y usar menos el coche.","Sí, en mi casa reciclamos todo el plástico, el vidrio y el papel.",""]
         },
         5: { 
             context: "Avería coche AP-6.", 
             prompts: ["1. Broken down.","2. Exit 156.","3. Replacement.","4. Red SEAT.","5. Answer question.","Fin."], 
-            dialogs: ["Hola, servicio de seguros. ¿Qué ha pasado?","¿Ves alguna señal de salida cerca de donde estás?","Enviamos una grúa inmediatamente.","¿Cómo es el coche exactamente para que el mecánico lo vea?",["¿Sabes cambiar ruedas tú solo?","¿Has tenido que esperar mucho tiempo?"],"¡Llegamos en 15 minutos!"], 
+            dialogs: ["Hola, servicio de seguros. ¿Qué ha pasado?","¿Ves alguna señal de salida cerca de donde estás?","Enviamos una grúa inmediatamente.","¿Cómo es el coche exactamente para que el mecánico lo vea?",["¿Cuántas personas viajan contigo en el coche?","¿A qué ciudad quieres ir con el coche de sustitución?","¿Cómo te sientes después del susto del coche?"],"¡Llegamos en 15 minutos!"], 
             sugerencias: ["Mi coche se ha averiado en la AP-6 hace un rato.","Veo la señal de la salida 156. ¿Puede enviarme un mecánico?","¿Me pueden dar un coche de sustitución para seguir el viaje?","Es un SEAT Ibiza rojo que antes era de mi tía.","No, no sé cambiar ruedas y no tengo herramientas.",""]}
     };
 
@@ -185,16 +185,20 @@
         let audioPath = "";
 
         if (Array.isArray(t)) {
+            // Lógica para preguntas sorpresa (Paso 5)
             let idx = Math.floor(Math.random() * t.length);
             t = t[idx];
+            // Genera rpX_5a.mp3, rpX_5b.mp3 o rpX_5c.mp3
             audioPath = `rp${rpActual}_5${['a','b','c'][idx]}.mp3`;
         } else {
+            // Lógica para pasos fijos (1, 2, 3, 4 y 6)
             audioPath = `rp${rpActual}_${pasoActual + 1}.mp3`;
         }
 
         const bubble = document.createElement('div');
         bubble.className = "bubble ex";
         bubble.innerHTML = `<b>Ex:</b> ${t}`;
+        // Permitimos repetir el audio al hacer click en la burbuja
         bubble.onclick = () => reproducirAudio(audioPath, t);
         
         document.getElementById('chat').appendChild(bubble);
