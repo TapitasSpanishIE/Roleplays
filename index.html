@@ -36,6 +36,13 @@
         .sub-header { font-size: 0.8em; color: #666; margin-top: 4px; }
         .author-credit { font-size: 0.75em; color: var(--snap-blue); margin-top: 5px; font-weight: 700; }
         
+        /* Botón sutil de donativo en header */
+        .btn-support-header {
+            display: inline-block; margin-top: 8px; padding: 6px 12px;
+            background: #f8f8f8; border: 1px solid #ddd; border-radius: 20px;
+            color: #555; text-decoration: none; font-size: 0.7em; font-weight: 700;
+        }
+
         .selector { 
             display: flex; overflow-x: auto; gap: 12px; padding: 15px; 
             background: white; flex-shrink: 0; scrollbar-width: none;
@@ -68,6 +75,19 @@
 
         .feedback-box { font-size: 0.95em; background: #fff9c4; color: #6d4c41; padding: 15px; border-radius: 20px; border-left: 5px solid var(--snap-yellow); align-self: center; width: 85%; margin: 10px 0; }
         
+        /* Tarjeta de cooperar al final */
+        .cooperate-card {
+            background: #f0f9ff; border: 2px dashed var(--snap-blue); border-radius: 25px;
+            padding: 20px; margin: 15px 0; text-align: center; align-self: center; width: 85%;
+            animation: fadeIn 0.5s ease;
+        }
+        .cooperate-card p { font-size: 0.9em; color: #333; line-height: 1.5; margin-bottom: 12px; }
+        .btn-cooperate {
+            display: inline-block; background: var(--snap-blue); color: white; 
+            padding: 10px 20px; border-radius: 50px; text-decoration: none; 
+            font-weight: 800; font-size: 0.9em;
+        }
+
         #next-trigger { 
             display: none; margin: 15px auto; padding: 18px; background: #ff004b; color: white; 
             border: none; border-radius: 50px; font-weight: 900; cursor: pointer; width: 85%; font-size: 16px; 
@@ -79,6 +99,8 @@
         .btn-send { background: var(--snap-blue); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 20px; }
         .btn-feedback { position: absolute; right: 20px; top: 20px; background: white; border: 2px solid #eee; border-radius: 50%; width: 40px; height: 40px; font-weight: bold; font-size: 18px; color: #999; }
         .btn-close { background: var(--snap-black); color: white; padding: 18px; border-radius: 50px; border: none; font-weight: 800; font-size: 1.1em; cursor: pointer; width: 100%; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -101,6 +123,7 @@
     <h1>SEC Role Play Simulator</h1>
     <div class="sub-header">Interactive training for the Leaving Cert Spanish Role Play section</div>
     <div class="author-credit">Developed by Sr. Martín</div>
+    <a href="https://revolut.me/davidkhy4" target="_blank" class="btn-support-header">❤ Support this project</a>
 </header>
 
 <div class="selector">
@@ -128,71 +151,11 @@
 <script>
     let rpActual = null; let pasoActual = 0; let speaking = false;
     const database = {
-        1: { 
-            context: "ERASMUS in Cáceres. You call for accommodation.", 
-            prompts: [
-                "1. Say you are going to Cáceres on Erasmus next year and ask for advice on accommodation.", 
-                "2. Say you'd prefer to live near the university and mention your experience living in the Dublin outskirts last year.", 
-                "3. Explain that you spent too much time travelling and you'd prefer to spend that time studying to get good grades.", 
-                "4. Mention the climate is better than Ireland. Say you'll consider all areas but would prefer the centre.", 
-                "5. Answer the examiner's surprise question.", 
-                "Role Play Completed."
-            ],
-            dialogs: ["¡Hola, dígame!", "¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña... ", ["¿Has estado alguna vez en España?", "¿Qué es lo que más te gusta de España?", "¿Por qué estudiar en España?"], "Hemos terminado, gracias"],
-            sugerencias: ["Hola, voy a ir de ERASMUS el año que viene. No conozco a nadie en Cáceres ¿Podría darme algún consejo sobre el alojamiento?", "Preferiría vivir cerca de la universidad porque el año pasado viví en las afueras de Dublín y no me gustó.", "Pues es que pasaba demasiado tiempo viajando. Si pudiera dedicar ese tiempo a estudiar, sacaría mejores notas.", "Bueno, el clima es mucho mejor que en Irlanda, así que consideraré todas las zonas aunque preferiría el centro.", "(Respuesta libre)", ""]
-        },
-        2: { 
-            context: "Broken laptop in Ávila. You are at a repair shop.", 
-            prompts: [
-                "1. Explain your laptop fell and the screen is broken. Mention you have an essay due tomorrow.", 
-                "2. Say you were late for the bus, you slipped and only noticed the problem when you got up.", 
-                "3. Say it's good it can be fixed but you saw the same model in the window for €300.", 
-                "4. Say you'll buy it if they copy your files to the new one and give you a free laptop bag.", 
-                "5. Answer the examiner's surprise question.", 
-                "Role Play Completed."
-            ],
-            dialogs: ["¡Hola! ¿En qué puedo ayudarte?", "Vamos a ver. ¿Qué te pasó?", "Vas a necesitar una nueva pantalla que cuesta doscientos euros.", "Sí, hay una oferta especial esta semana. ¿Quieres comprarlo?", ["¿De qué marca es tu ordenador?","¿Para qué usas el ordenador normalmente?","¿De qué color te gustaría la funda del ordenador?"], "Hemos terminado, gracias"],
-            sugerencias: ["Se me cayó el portátil y la pantalla está rota. Lo peor es que tengo que entregar un ensayo mañana y la única copia que tengo está en mi portátil.", "Llegaba tarde y tuve que correr para coger el autobús. Me resbalé y el portátil se cayó al suelo y me di cuenta del problema en cuanto me levanté.", "Es bueno saber que tiene arreglo pero he visto un portátil del mismo modelo y la misma marca a la venta en el escaparate y solo cuesta trescientos euros.", "Lo compraré si puedes copiar todos mis archivos al nuevo disco duro antes de salir de la tienda y si me das un bolso gratis para el portátil.", "(Respuesta libre)", ""]
-        },
-        3: { 
-            context: "Hiring a camper van for a family holiday in Spain.", 
-            prompts: [
-                "1. Say you are a student calling from Ireland and want to hire a camper van for 2 weeks in July.", 
-                "2. Explain your mother will be driving. Say you are taking lessons and hope to pass in the Autumn.", 
-                "3. Say she has driven on the right in Europe for 20 years and is a very careful driver.", 
-                "4. Mention you want to see the land of Cervantes (Castilla-La Mancha) far from the tourists.", 
-                "5. Answer the examiner's surprise question.", 
-                "Role Play Completed."
-            ],
-            dialogs: ["¡Hola! ¿En qué puedo ayudarte?", "Para alquilar un cámper hace falta tener al menos veinticinco años y mucha experiencia al volante.", "Pues, muy bien. Tu madre cumple con los requisitos para alquilar un cámper.", "¡Fenomenal! Os alquilo un cámper. ¿Tenéis el itinerario previsto?", ["¿A qué hora vais a recoger el cámper?", "¿Qué tipo de música os gusta escuchar en el coche?", "¿Qué ciudades te gustaría visitar en vuestro viaje?"], "Hemos terminado, gracias"],
-            sugerencias: ["Soy estudiante y llamo desde Irlanda, me interesa alquilar un cámper durante dos semanas en julio.", "Mi madre va a conducir porque yo todavía no tengo el carné de conducir. Estoy yendo a clases de conducir y espero aprobar el examen en otoño.", "Ha conducido por la derecha en varios países europeos durante los últimos veinte años. Es una conductora muy prudente y nunca ha tenido un accidente.", "Hemos pasado mucho tiempo en la costa, pero este verano nos gustaría viajar por Castilla-La Mancha para ver la tierra de Cervantes y Don Quijote, lejos de los turistas.", "(Respuesta libre)", ""]
-        },
-        4: { 
-            context: "Discussion about single-use plastics and pollution.", 
-            prompts: [
-                "1. Mention the EU has agreed to ban single-use plastics like knives, straws, and cups.", 
-                "2. Explain this is essential for the planet's waters and is a serious problem in rivers and oceans.", 
-                "3. Suggest using recycled paper, cardboard, and other biodegradable materials instead.", 
-                "4. Say we must be responsible and change our lifestyle by cycling or using public transport.", 
-                "5. Answer the examiner's surprise question.", 
-                "Role Play Completed."
-            ],
-            dialogs: ["Pareces muy contento, ¿por qué?", "¿Es importante prohibir plásticos de usar y tirar?", "¿Podemos hacer algo más?", "Y, ¿ya está?", ["¿Qué cosas reciclas tú en tu casa?", "¿Qué haces tú para ayudar al medioambiente?", "¿Qué transporte usas para venir al instituto?"], "Hemos terminado, gracias"],
-            sugerencias: ["El Parlamento Europeo ha convenido prohibir los plásticos de un solo uso, por ejemplo, los cuchillos, los tenedores, las cucharas, las tazas, los platos y las pajitas.", "Sí, es absolutamente imprescindible. Será muy bueno para las aguas del planeta. La contaminación causada por los plásticos es un problema grave en ríos, lagos y océanos.", "Hay muchas cosas que podemos hacer. Por ejemplo, en vez de usar plásticos, podemos usar papel reciclado, cartón y otros materiales biodegradables.", "No, como ciudadanos necesitamos ser más responsables y cambiar nuestro estilo de vida. Para proteger el medio ambiente podríamos ir en bicicleta, usar el transporte público o caminar más a menudo.", "(Respuesta libre)", ""]
-        },
-        5: { 
-            context: "Car breakdown on the AP-6 highway. Calling insurance.", 
-            prompts: [
-                "1. Explain the car has broken down on the AP-6 and you passed the toll half an hour ago.", 
-                "2. Say you can see exit sign 156 and ask to send a mechanic or a tow truck.", 
-                "3. Ask for a replacement car to continue your journey to Lugo to collect your parents.", 
-                "4. Describe the car: Red Seat Ibiza, plate 4620 CFK, bought from your aunt.", 
-                "5. Answer the examiner's surprise question.", 
-                "Role Play Completed."
-            ],
-            dialogs: ["Hola, buenas tardes.", "Debes estar entre Medina del Campo y Tordesillas. ¿Hay alguna señal de tráfico por ahí?", "Claro que sí. Voy a arreglarlo todo inmediatamente.", "Por supuesto. ¿Me puedes describir tu coche?", ["¿Cuántas personas viajan contigo en el coche?", "¿Qué ciudades te gustaría visitar?", "¿Cuánto costó el coche?"], "Hemos terminado, gracias"],
-            sugerencias: ["Mi coche acaba de averiarse y estoy en la autopista AP-6. No sé exactamente donde estoy pero pasé por el peaje hace media hora.", "Puedo ver la señal de salida 156 a lo lejos. ¿Pueden enviar un mecánico o quizás una grúa? Es que creo que el problema es serio.", "¿Podrían darme un coche de sustitución para que pueda seguir mi viaje a Lugo? Tengo que recoger a mis padres en el aeropuerto de Santiago de Compostela.", "Es un Seat Ibiza rojo. La matrícula es 4620 CFK. Se lo compré de segunda mano a mi tía y nunca he tenido un problema con él antes.", "(Respuesta libre)", ""]
-        }
+        1: { context: "ERASMUS in Cáceres. You call for accommodation.", prompts: ["1. Say you are going to Cáceres on Erasmus next year and ask for advice on accommodation.", "2. Say you'd prefer to live near the university and mention your experience living in the Dublin outskirts last year.", "3. Explain that you spent too much time travelling and you'd prefer to spend that time studying to get good grades.", "4. Mention the climate is better than Ireland. Say you'll consider all areas but would prefer the centre.", "5. Answer the examiner's surprise question.", "Role Play Completed."], dialogs: ["¡Hola, dígame!", "¿En qué parte de la ciudad querrías vivir?", "¿Por qué?", "Tienes razón. Pero sabes que Cáceres es una ciudad muy pequeña... ", ["¿Has estado alguna vez en España?", "¿Qué es lo que más te gusta de España?", "¿Por qué estudiar en España?"], "Hemos terminado, gracias"], sugerencias: ["Hola, voy a ir de ERASMUS el año que viene. No conozco a nadie en Cáceres ¿Podría darme algún consejo sobre el alojamiento?", "Preferiría vivir cerca de la universidad porque el año pasado viví en las afueras de Dublín y no me gustó.", "Pues es que pasaba demasiado tiempo viajando. Si pudiera dedicar ese tiempo a estudiar, sacaría mejores notas.", "Bueno, el clima es mucho mejor que en Irlanda, así que consideraré todas las zonas aunque preferiría el centro.", "(Respuesta libre)", ""] },
+        2: { context: "Broken laptop in Ávila. You are at a repair shop.", prompts: ["1. Explain your laptop fell and the screen is broken. Mention you have an essay due tomorrow.", "2. Say you were late for the bus, you slipped and only noticed the problem when you got up.", "3. Say it's good it can be fixed but you saw the same model in the window for €300.", "4. Say you'll buy it if they copy your files to the new one and give you a free laptop bag.", "5. Answer the examiner's surprise question.", "Role Play Completed."], dialogs: ["¡Hola! ¿En qué puedo ayudarte?", "Vamos a ver. ¿Qué te pasó?", "Vas a necesitar una nueva pantalla que cuesta doscientos euros.", "Sí, hay una oferta especial esta semana. ¿Quieres comprarlo?", ["¿De qué marca es tu ordenador?","¿Para qué usas el ordenador normalmente?","¿De qué color te gustaría la funda del ordenador?"], "Hemos terminado, gracias"], sugerencias: ["Se me cayó el portátil y la pantalla está rota. Lo peor es que tengo que entregar un ensayo mañana y la única copia que tengo está en mi portátil.", "Llegaba tarde y tuve que correr para coger el autobús. Me resbalé y el portátil se cayó al suelo y me di cuenta del problema en cuanto me levanté.", "Es bueno saber que tiene arreglo pero he visto un portátil del mismo modelo y la misma marca a la venta en el escaparate y solo cuesta trescientos euros.", "Lo compraré si puedes copiar todos mis archivos al nuevo disco duro antes de salir de la tienda y si me das un bolso gratis para el portátil.", "(Respuesta libre)", ""] },
+        3: { context: "Hiring a camper van for a family holiday in Spain.", prompts: ["1. Say you are a student calling from Ireland and want to hire a camper van for 2 weeks in July.", "2. Explain your mother will be driving. Say you are taking lessons and hope to pass in the Autumn.", "3. Say she has driven on the right in Europe for 20 years and is a very careful driver.", "4. Mention you want to see the land of Cervantes (Castilla-La Mancha) far from the tourists.", "5. Answer the examiner's surprise question.", "Role Play Completed."], dialogs: ["¡Hola! ¿En qué puedo ayudarte?", "Para alquilar un cámper hace falta tener al menos veinticinco años y mucha experiencia al volante.", "Pues, muy bien. Tu madre cumple con los requisitos para alquilar un cámper.", "¡Fenomenal! Os alquilo un cámper. ¿Tenéis el itinerario previsto?", ["¿A qué hora vais a recoger el cámper?", "¿Qué tipo de música os gusta escuchar en el coche?", "¿Qué ciudades te gustaría visitar en vuestro viaje?"], "Hemos terminado, gracias"], sugerencias: ["Soy estudiante y llamo desde Irlanda, me interesa alquilar un cámper durante dos semanas en julio.", "Mi madre va a conducir porque yo todavía no tengo el carné de conducir. Estoy yendo a clases de conducir y espero aprobar el examen en otoño.", "Ha conducido por la derecha en varios países europeos durante los últimos veinte años. Es una conductora muy prudente y nunca ha tenido un accidente.", "Hemos pasado mucho tiempo en la costa, pero este verano nos gustaría viajar por Castilla-La Mancha para ver la tierra de Cervantes y Don Quijote, lejos de los turistas.", "(Respuesta libre)", ""] },
+        4: { context: "Discussion about single-use plastics and pollution.", prompts: ["1. Mention the EU has agreed to ban single-use plastics like knives, straws, and cups.", "2. Explain this is essential for the planet's waters and is a serious problem in rivers and oceans.", "3. Suggest using recycled paper, cardboard, and other biodegradable materials instead.", "4. Say we must be responsible and change our lifestyle by cycling or using public transport.", "5. Answer the examiner's surprise question.", "Role Play Completed."], dialogs: ["Pareces muy contento, ¿por qué?", "¿Es importante prohibir plásticos de usar y tirar?", "¿Podemos hacer algo más?", "Y, ¿ya está?", ["¿Qué cosas reciclas tú en tu casa?", "¿Qué haces tú para ayudar al medioambiente?", "¿Qué transporte usas para venir al instituto?"], "Hemos terminado, gracias"], sugerencias: ["El Parlamento Europeo ha convenido prohibir los plásticos de un solo uso, por ejemplo, los cuchillos, los tenedores, las cucharas, las tazas, los platos y las pajitas.", "Sí, es absolutamente imprescindible. Será muy bueno para las aguas del planeta. La contaminación causada por los plásticos es un problema grave en ríos, lagos y océanos.", "Hay muchas cosas que podemos hacer. Por ejemplo, en vez de usar plásticos, podemos usar papel reciclado, cartón y otros materiales biodegradables.", "No, como ciudadanos necesitamos ser más responsables y cambiar nuestro estilo de vida. Para proteger el medio ambiente podríamos ir en bicicleta, usar el transporte público o caminar más a menudo.", "(Respuesta libre)", ""] },
+        5: { context: "Car breakdown on the AP-6 highway. Calling insurance.", prompts: ["1. Explain the car has broken down on the AP-6 and you passed the toll half an hour ago.", "2. Say you can see exit sign 156 and ask to send a mechanic or a tow truck.", "3. Ask for a replacement car to continue your journey to Lugo to collect your parents.", "4. Describe the car: Red Seat Ibiza, plate 4620 CFK, bought from your aunt.", "5. Answer the examiner's surprise question.", "Role Play Completed."], dialogs: ["Hola, buenas tardes.", "Debes estar entre Medina del Campo y Tordesillas. ¿Hay alguna señal de tráfico por ahí?", "Claro que sí. Voy a arreglarlo todo inmediatamente.", "Por supuesto. ¿Me puedes describir tu coche?", ["¿Cuántas personas viajan contigo en el coche?", "¿Qué ciudades te gustaría visitar?", "¿Cuánto costó el coche?"], "Hemos terminado, gracias"], sugerencias: ["Mi coche acaba de averiarse y estoy en la autopista AP-6. No sé exactamente donde estoy pero pasé por el peaje hace media hora.", "Puedo ver la señal de salida 156 a lo lejos. ¿Pueden enviar un mecánico o quizás una grúa? Es que creo que el problema es serio.", "¿Podrían darme un coche de sustitución para que pueda seguir mi viaje a Lugo? Tengo que recoger a mis padres en el aeropuerto de Santiago de Compostela.", "Es un Seat Ibiza rojo. La matrícula es 4620 CFK. Se lo compré de segunda mano a mi tía y nunca he tenido un problema con él antes.", "(Respuesta libre)", ""] }
     };
 
     function startApp() { new Audio().play().catch(()=>{}); document.getElementById('modal-instrucciones').style.display = 'none'; }
@@ -200,8 +163,22 @@
     function seleccionarRP(id, btn) { rpActual = id; pasoActual = 0; speaking = false; document.querySelectorAll('.rp-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.getElementById('candidate-card').style.display = "block"; document.getElementById('card-context').innerHTML = database[id].context; document.getElementById('chat').innerHTML = ""; document.getElementById('current-prompt').innerHTML = "Tap the RED BUTTON to begin."; document.getElementById('next-trigger').style.display = "block"; setInputEnabled(false); }
     function mostrarSugerencia() { const sug = database[rpActual]?.sugerencias[pasoActual]; if(sug) { const fb = document.createElement('div'); fb.className = 'feedback-box'; fb.innerHTML = `💡 <b>Model Answer:</b> ${sug}`; document.getElementById('chat').appendChild(fb); document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight; } }
     function enviarRespuesta() { const input = document.getElementById('userInput'); const text = input.value.trim(); if (!text || speaking) return; document.getElementById('chat').innerHTML += `<div class="bubble st">${text}</div>`; input.value = ""; document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight; setInputEnabled(false); pasoActual++; setTimeout(() => { document.getElementById('next-trigger').style.display = "block"; }, 300); }
-    function reproducirAudio(path, fallbackText) { window.speechSynthesis.cancel(); const audio = new Audio(path); const onEndAction = () => { speaking = false; if(pasoActual < (database[rpActual].dialogs.length - 1)) { setInputEnabled(true); } }; audio.play().then(() => { audio.onended = onEndAction; }).catch(() => { const msg = new SpeechSynthesisUtterance(fallbackText); msg.lang = 'es-ES'; msg.onend = onEndAction; window.speechSynthesis.speak(msg); }); }
+    function reproducirAudio(path, fallbackText) { window.speechSynthesis.cancel(); const audio = new Audio(path); const onEndAction = () => { speaking = false; if(pasoActual < (database[rpActual].dialogs.length - 1)) { setInputEnabled(true); } else { mostrarCooperar(); } }; audio.play().then(() => { audio.onended = onEndAction; }).catch(() => { const msg = new SpeechSynthesisUtterance(fallbackText); msg.lang = 'es-ES'; msg.onend = onEndAction; window.speechSynthesis.speak(msg); }); }
     function proximaIntervencion() { if (!rpActual || speaking) return; document.getElementById('next-trigger').style.display = "none"; speaking = true; let dialogText = database[rpActual].dialogs[pasoActual]; let audioFile = ""; if (Array.isArray(dialogText)) { let randomIndex = Math.floor(Math.random() * dialogText.length); dialogText = dialogText[randomIndex]; audioFile = `rp${rpActual}_5${['a','b','c'][randomIndex]}.mp3`; } else { audioFile = `rp${rpActual}_${pasoActual + 1}.mp3`; } const chat = document.getElementById('chat'); const bubble = document.createElement('div'); bubble.className = "bubble ex"; bubble.innerHTML = `<b>Examiner:</b> ${dialogText}`; bubble.onclick = () => reproducirAudio(audioFile, dialogText); chat.appendChild(bubble); document.getElementById('current-prompt').innerHTML = `<b>Prompt:</b> ${database[rpActual].prompts[pasoActual]}`; chat.scrollTop = chat.scrollHeight; reproducirAudio(audioFile, dialogText); }
+    
+    function mostrarCooperar() {
+        if(document.getElementById('coop-card')) return;
+        const chat = document.getElementById('chat');
+        const card = document.createElement('div');
+        card.id = "coop-card";
+        card.className = "cooperate-card";
+        card.innerHTML = `
+            <p>Espero que esta herramienta te sea muy útil. Si quieres, puedes cooperar con un donativo para apoyar esta iniciativa y poder crear más herramientas para JC y LC.</p>
+            <a href="https://revolut.me/davidkhy4" target="_blank" class="btn-cooperate">Cooperar con el proyecto</a>
+        `;
+        chat.appendChild(card);
+        chat.scrollTop = chat.scrollHeight;
+    }
 </script>
 </body>
 </html>
