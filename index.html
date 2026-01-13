@@ -162,18 +162,42 @@
     function seleccionarRP(id, btn) { rpActual = id; pasoActual = 0; speaking = false; document.querySelectorAll('.rp-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.getElementById('candidate-card').style.display = "block"; document.getElementById('card-context').innerHTML = database[id].context; document.getElementById('chat').innerHTML = ""; document.getElementById('current-prompt').innerHTML = "Tap the RED BUTTON to begin."; document.getElementById('next-trigger').style.display = "block"; setInputEnabled(false); }
     function mostrarSugerencia() { const sug = database[rpActual]?.sugerencias[pasoActual]; if(sug) { const fb = document.createElement('div'); fb.className = 'feedback-box'; fb.innerHTML = `💡 <b>Model Answer:</b> ${sug}`; document.getElementById('chat').appendChild(fb); document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight; } }
     function enviarRespuesta() { const input = document.getElementById('userInput'); const text = input.value.trim(); if (!text || speaking) return; document.getElementById('chat').innerHTML += `<div class="bubble st">${text}</div>`; input.value = ""; document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight; setInputEnabled(false); pasoActual++; setTimeout(() => { document.getElementById('next-trigger').style.display = "block"; }, 300); }
-    function reproducirAudio(path, fallbackText) { window.speechSynthesis.cancel(); const audio = new Audio(path); const onEndAction = () => { speaking = false; if(pasoActual < (database[rpActual].dialogs.length - 1)) { setInputEnabled(true); } else { mostrarCooperar(); } }; audio.play().then(() => { audio.onended = onEndAction; }).catch(() => { const msg = new SpeechSynthesisUtterance(fallbackText); msg.lang = 'es-ES'; msg.onend = onEndAction; window.speechSynthesis.speak(msg); }); }
+        function reproducirAudio(path, fallbackText) { 
+        window.speechSynthesis.cancel(); 
+        const audio = new Audio(path); 
+        const onEndAction = () => { 
+            speaking = false; 
+            if(pasoActual < (database[rpActual].dialogs.length - 1)) { 
+                setInputEnabled(true); 
+            } else { 
+                mostrarCooperar(); 
+            } 
+        };
+
+        audio.play().then(() => { 
+            audio.onended = onEndAction; 
+        }).catch(() => { 
+            const msg = new SpeechSynthesisUtterance(fallbackText); 
+            msg.lang = 'es-ES'; 
+            msg.rate = 0.9;
+            msg.onend = onEndAction; 
+            window.speechSynthesis.speak(msg); 
+        }); 
+    }
+
     function proximaIntervencion() { if (!rpActual || speaking) return; document.getElementById('next-trigger').style.display = "none"; speaking = true; let dialogText = database[rpActual].dialogs[pasoActual]; let audioFile = ""; if (Array.isArray(dialogText)) { let randomIndex = Math.floor(Math.random() * dialogText.length); dialogText = dialogText[randomIndex]; audioFile = `rp${rpActual}_5${['a','b','c'][randomIndex]}.mp3`; } else { audioFile = `rp${rpActual}_${pasoActual + 1}.mp3`; } const chat = document.getElementById('chat'); const bubble = document.createElement('div'); bubble.className = "bubble ex"; bubble.innerHTML = `<b>Examiner:</b> ${dialogText}`; bubble.onclick = () => reproducirAudio(audioFile, dialogText); chat.appendChild(bubble); document.getElementById('current-prompt').innerHTML = `<b>Prompt:</b> ${database[rpActual].prompts[pasoActual]}`; chat.scrollTop = chat.scrollHeight; reproducirAudio(audioFile, dialogText); }
     
-    function mostrarCooperar() {
+        function mostrarCooperar() {
         if(document.getElementById('coop-card')) return;
         const chat = document.getElementById('chat');
         const card = document.createElement('div');
         card.id = "coop-card";
         card.className = "cooperate-card";
         card.innerHTML = `
-            <p>Espero que esta herramienta te sea muy útil. Si quieres, puedes cooperar con un donativo para apoyar esta iniciativa y poder crear más herramientas para JC y LC.</p>
-            <a href="https://revolut.me/davidkhy4" target="_blank" class="btn-cooperate">Cooperar con el proyecto</a>
+            <p><b>Great job!</b> This tool is, and will always be, free for all students and teachers.</p>
+            <p style="font-size: 0.85em; color: #666;">If you find it helpful, consider supporting this independent project with a small donation. Every bit helps me create more free resources for JC and LC Spanish!</p>
+            <a href="https://revolut.me/davidkhy4" target="_blank" class="btn-cooperate">Support this project</a>
+            <p style="font-size: 0.75em; margin-top: 10px; color: #999;">(Or just keep practicing! Good luck with your exams! 🍀)</p>
         `;
         chat.appendChild(card);
         chat.scrollTop = chat.scrollHeight;
