@@ -43,6 +43,34 @@
             color: #555; text-decoration: none; font-size: 0.7em; font-weight: 700;
         }
 
+        /* Tech Support Styles */
+        #help-trigger {
+            position: fixed; top: 15px; left: 15px;
+            background: var(--snap-black); color: white;
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; cursor: pointer; z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        #help-panel {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); width: 85%; max-width: 400px;
+            background: white; border-radius: 30px; padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4); z-index: 10001;
+            max-height: 80vh; overflow-y: auto;
+        }
+        #help-panel h2 { color: var(--snap-blue); margin-top: 0; font-weight: 900; }
+        .help-item { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 0.9em; line-height: 1.4; }
+        .help-item b { color: var(--snap-black); display: block; margin-bottom: 4px; }
+        .help-close { 
+            background: var(--snap-blue); color: white; border: none; 
+            padding: 15px; border-radius: 50px; width: 100%; font-weight: 800; cursor: pointer;
+        }
+        .overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); z-index: 10000; 
+        }
+
         .selector { 
             display: flex; overflow-x: auto; gap: 12px; padding: 15px; 
             background: white; flex-shrink: 0; scrollbar-width: none;
@@ -104,6 +132,29 @@
 </head>
 <body>
 
+<div id="help-trigger" onclick="toggleHelp()">🛠️</div>
+<div id="overlay" class="overlay" onclick="toggleHelp()"></div>
+<div id="help-panel">
+    <h2>Tech Support 🛠️</h2>
+    <div class="help-item">
+        <b>🎙️ Speech-to-text issues?</b>
+        If your microphone writes English words (e.g. "Boy" instead of "Voy"), your keyboard is set to English. 
+        <br><br>
+        To fix this:
+        1. Go to your device <b>Settings > General > Keyboard</b> and add <b>Spanish</b>.
+        2. When typing in this app, tap the <b>Globe icon (🌐)</b> on your keyboard to switch to Spanish before speaking.
+    </div>
+    <div class="help-item">
+        <b>🔄 App is stuck?</b>
+        If the app stops responding or a button doesn't work, simply <b>Refresh</b> the page. This fixes most temporary connection errors.
+    </div>
+    <div class="help-item">
+        <b>🔇 No audio or microphone?</b>
+        Check if your device is on silent mode. We recommend using <b>Safari</b> (on iPhone/iPad) or <b>Chrome</b> for the best experience.
+    </div>
+    <button class="help-close" onclick="toggleHelp()">BACK TO PRACTICE</button>
+</div>
+
 <div id="modal-instrucciones">
     <div class="modal-content">
         <h1>SEC Simulator</h1>
@@ -158,11 +209,21 @@
     };
 
     function startApp() { new Audio().play().catch(()=>{}); document.getElementById('modal-instrucciones').style.display = 'none'; }
+    
+    function toggleHelp() {
+        const panel = document.getElementById('help-panel');
+        const overlay = document.getElementById('overlay');
+        const isVisible = panel.style.display === 'block';
+        panel.style.display = isVisible ? 'none' : 'block';
+        overlay.style.display = isVisible ? 'none' : 'block';
+    }
+
     function setInputEnabled(e) { const input = document.getElementById('userInput'); input.disabled = !e; document.getElementById('sendBtn').disabled = !e; document.getElementById('feedbackBtn').style.display = e ? "block" : "none"; input.placeholder = e ? "Type your reply here..." : "Wait for examiner..."; if(e) input.focus(); }
     function seleccionarRP(id, btn) { rpActual = id; pasoActual = 0; speaking = false; document.querySelectorAll('.rp-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); document.getElementById('candidate-card').style.display = "block"; document.getElementById('card-context').innerHTML = database[id].context; document.getElementById('chat').innerHTML = ""; document.getElementById('current-prompt').innerHTML = "Tap the RED BUTTON to begin."; document.getElementById('next-trigger').style.display = "block"; setInputEnabled(false); }
     function mostrarSugerencia() { const sug = database[rpActual]?.sugerencias[pasoActual]; if(sug) { const fb = document.createElement('div'); fb.className = 'feedback-box'; fb.innerHTML = `💡 <b>Model Answer:</b> ${sug}`; document.getElementById('chat').appendChild(fb); document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight; } }
     function enviarRespuesta() { const input = document.getElementById('userInput'); const text = input.value.trim(); if (!text || speaking) return; document.getElementById('chat').innerHTML += `<div class="bubble st">${text}</div>`; input.value = ""; document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight; setInputEnabled(false); pasoActual++; setTimeout(() => { document.getElementById('next-trigger').style.display = "block"; }, 300); }
-        function reproducirAudio(path, fallbackText) { 
+    
+    function reproducirAudio(path, fallbackText) { 
         window.speechSynthesis.cancel(); 
         const audio = new Audio(path); 
         const onEndAction = () => { 
@@ -187,7 +248,7 @@
 
     function proximaIntervencion() { if (!rpActual || speaking) return; document.getElementById('next-trigger').style.display = "none"; speaking = true; let dialogText = database[rpActual].dialogs[pasoActual]; let audioFile = ""; if (Array.isArray(dialogText)) { let randomIndex = Math.floor(Math.random() * dialogText.length); dialogText = dialogText[randomIndex]; audioFile = `rp${rpActual}_5${['a','b','c'][randomIndex]}.mp3`; } else { audioFile = `rp${rpActual}_${pasoActual + 1}.mp3`; } const chat = document.getElementById('chat'); const bubble = document.createElement('div'); bubble.className = "bubble ex"; bubble.innerHTML = `<b>Examiner:</b> ${dialogText}`; bubble.onclick = () => reproducirAudio(audioFile, dialogText); chat.appendChild(bubble); document.getElementById('current-prompt').innerHTML = `<b>Prompt:</b> ${database[rpActual].prompts[pasoActual]}`; chat.scrollTop = chat.scrollHeight; reproducirAudio(audioFile, dialogText); }
     
-        function mostrarCooperar() {
+    function mostrarCooperar() {
         if(document.getElementById('coop-card')) return;
         const chat = document.getElementById('chat');
         const card = document.createElement('div');
